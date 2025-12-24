@@ -16,8 +16,11 @@ import {
     Info,
     CheckCircle2,
     Calendar,
-    Navigation2
+    Navigation2,
+    Car,
+    ChevronDown
 } from 'lucide-react';
+
 import JSZip from 'jszip';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -103,7 +106,12 @@ export default function App() {
     const [loading, setLoading] = useState(false);
     const [selectedPoint, setSelectedPoint] = useState(null);
     const [tokyoHubs, setTokyoHubs] = useState(INITIAL_HUBS);
+    const [busStops, setBusStops] = useState([]);
+    const [busFares, setBusFares] = useState({});
+    const [busTimetables, setBusTimetables] = useState([]);
     const [view, setView] = useState('planner');
+    const [showIntermediary, setShowIntermediary] = useState(false);
+    const [liveRouteData, setLiveRouteData] = useState({ fares: [], schedules: [] });
 
     const [planner, setPlanner] = useState({
         from: INITIAL_HUBS[0],
@@ -111,12 +119,12 @@ export default function App() {
         departDate: new Date().toISOString().split('T')[0]
     });
 
-    // Fetch Hub Stations from ODPT
+    // Fetch Hub Stations from ODPT with Coordinates
     const fetchHubStations = async () => {
         try {
             const hubsToFetch = ['Tokyo', 'Shinjuku', 'Ueno'];
-            const stationsUrl = `${ODPT_URL}/odpt:Station?acl:consumerKey=${API_KEY}`;
-            const response = await fetch(stationsUrl);
+            const url = `${ODPT_URL}/odpt:Station?acl:consumerKey=${API_KEY}`;
+            const response = await fetch(url);
             const data = await response.json();
 
             if (Array.isArray(data)) {
@@ -129,7 +137,11 @@ export default function App() {
                     .reduce((acc, curr) => {
                         const name = curr["odpt:stationTitle"]?.en || curr["dc:title"];
                         const existing = acc.find(a => a.name === name);
-                        const lineName = curr["odpt:railway"]?.split('.').pop()?.replace('-', ' ') || "Local Line";
+                        const lineRaw = curr["odpt:railway"]?.split('.').pop() || "Local";
+                        const lineName = lineRaw
+                            .replace(/([A-Z])/g, ' $1')
+                            .replace('-', ' ')
+                            .trim() + " Line";
 
                         if (existing) {
                             if (!existing.lines.includes(lineName)) existing.lines.push(lineName);
@@ -137,6 +149,8 @@ export default function App() {
                             acc.push({
                                 id: curr["owl:sameAs"],
                                 name: name,
+                                lat: curr["geo:lat"],
+                                lon: curr["geo:long"],
                                 lines: [lineName]
                             });
                         }
@@ -149,15 +163,81 @@ export default function App() {
                 }
             }
         } catch (e) {
-            console.warn("Failed to fetch hubs from ODPT, using fallbacks", e);
+            console.warn("Hub fetch failed", e);
+        }
+    };
+
+    // Fetch ODPT Bus Data for Efficiency & Cost Modeling
+    const fetchBusData = async () => {
+        try {
+            // Bus Poles for spatial mapping
+            const poleRes = await fetch(`${ODPT_URL}/odpt:BusstopPole?acl:consumerKey=${API_KEY}`);
+            const poles = await poleRes.json();
+            setBusStops(Array.isArray(poles) ? poles.slice(0, 50) : []);
+
+            // Fares for cost modeling
+            const fareRes = await fetch(`${ODPT_URL}/odpt:BusroutePatternFare?acl:consumerKey=${API_KEY}`);
+            const fareData = await fareRes.json();
+            const fareMap = {};
+            if (Array.isArray(fareData)) {
+                fareData.forEach(f => {
+                    fareMap[f["odpt:busroutePattern"]] = f["odpt:ticketFare"] || 210;
+                });
+            }
+            setBusFares(fareMap);
+
+            // Timetables for efficiency (frequency)
+            const ttRes = await fetch(`${ODPT_URL}/odpt:BusTimetable?acl:consumerKey=${API_KEY}`);
+            const tts = await ttRes.json();
+            setBusTimetables(Array.isArray(tts) ? tts.slice(0, 30) : []);
+        } catch (e) {
+            console.warn("Bus data fetch failed", e);
         }
     };
 
     useEffect(() => {
         fetchHubStations();
+        fetchBusData();
+
+        // Load default GTFS-flex data from datasource folder
+        const loadDefaultGTFS = async () => {
+            try {
+                // Get URLs for all default zip files in the datasource
+                const defaultModules = import.meta.glob('./app/datasource/gtfs-flex/*.zip', {
+                    query: '?url',
+                    import: 'default',
+                    eager: true
+                });
+                const zipEntries = Object.entries(defaultModules);
+
+                if (zipEntries.length === 0) return;
+
+                setLoading(true);
+
+                // Process each zip file sequentially to avoid state race conditions
+                for (let i = 0; i < zipEntries.length; i++) {
+                    const [path, module] = zipEntries[i];
+                    const url = module.default || module;
+                    const response = await fetch(url);
+                    const blob = await response.blob();
+                    const filename = path.split('/').pop();
+                    const file = new File([blob], filename, { type: 'application/zip' });
+
+                    // We call processGTFSFiles which handles ingestion and state updates
+                    // Only set the first one as active to avoid multiple ODPT triggers
+                    await processGTFSFiles([file], i === 0);
+                }
+            } catch (err) {
+                console.error("Default GTFS loading failed", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadDefaultGTFS();
     }, []);
 
-    const processGTFSFiles = async (files) => {
+    const processGTFSFiles = async (files, setActive = true) => {
         setLoading(true);
         try {
             const fileMap = {};
@@ -203,7 +283,7 @@ export default function App() {
 
             const newDataset = {
                 name: areaName,
-                id: 'area-' + Date.now(),
+                id: 'area-' + Date.now() + Math.random(),
                 hubStation: hubStation,
                 stops: stopsData.slice(0, 100).map(s => ({
                     id: s.stop_id || Math.random().toString(),
@@ -224,8 +304,10 @@ export default function App() {
 
             setDatasets(prev => {
                 const updated = [...prev, newDataset];
-                setActiveDatasetIndex(updated.length - 1);
-                setPlanner(p => ({ ...p, toStop: newDataset.stops[0] }));
+                if (setActive) {
+                    setActiveDatasetIndex(updated.length - 1);
+                    setPlanner(p => ({ ...p, toStop: newDataset.stops[0] }));
+                }
                 return updated;
             });
         } catch (error) {
@@ -243,83 +325,83 @@ export default function App() {
 
     const activeDataset = datasets[activeDatasetIndex] || null;
 
+    // Live ODPT Data Orchestration
+    useEffect(() => {
+        const fetchLiveTrainData = async () => {
+            if (!planner.from?.id || !activeDataset?.hubStation) return;
+
+            try {
+                // 1. Resolve Hub Station ID (GTFS -> ODPT)
+                const hubSearchUrl = `${ODPT_URL}/odpt:Station?acl:consumerKey=${API_KEY}&dc:title=${encodeURIComponent(activeDataset.hubStation.replace(' Station', ''))}`;
+                const hubRes = await fetch(hubSearchUrl);
+                const hubData = await hubRes.json();
+                const odptHubId = hubData[0]?.["owl:sameAs"];
+
+                if (!odptHubId) return;
+
+                // 2. Fetch Fare (From Station -> Hub)
+                const fareUrl = `${ODPT_URL}/odpt:RailwayFare?acl:consumerKey=${API_KEY}&odpt:fromStation=${planner.from.id}&odpt:toStation=${odptHubId}`;
+                const fareRes = await fetch(fareUrl);
+                const fares = await fareRes.json();
+
+                // 3. Fetch Next Departures (From Station)
+                const ttUrl = `${ODPT_URL}/odpt:StationTimetable?acl:consumerKey=${API_KEY}&odpt:station=${planner.from.id}`;
+                const ttRes = await fetch(ttUrl);
+                const timetables = await ttRes.json();
+
+                setLiveRouteData({
+                    fares,
+                    schedules: timetables,
+                    hubOdptId: odptHubId
+                });
+            } catch (err) {
+                console.error("Live sync failed", err);
+            }
+        };
+
+        fetchLiveTrainData();
+    }, [planner.from, activeDataset]);
+
     const addMins = (date, mins) => new Date(date.getTime() + mins * 60000);
     const formatTime = (date) => date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
     const itinerary = useMemo(() => {
-        if (!planner.from || !activeDataset || !planner.toStop || !tokyoHubs.length) return null;
+        if (!activeDataset || !planner.toStop) return null;
 
         const now = new Date();
         const start = addMins(now, 5);
 
-        const hubOnSameLine = tokyoHubs.find(h =>
-            h.name !== planner.from.name &&
-            h.lines.some(l => planner.from.lines.includes(l))
-        );
-
-        const junctionName = hubOnSameLine ? hubOnSameLine.name : (planner.from.name.includes("Tokyo") ? "Shinagawa" : "Tokyo Station");
-        const junctionLine = hubOnSameLine ? hubOnSameLine.lines.find(l => planner.from.lines.includes(l)) : planner.from.lines[0];
-
         const legs = [];
         let current = start;
 
-        legs.push({
-            type: 'train',
-            from: planner.from.name,
-            to: junctionName,
-            line: junctionLine,
-            dep: formatTime(current),
-            arr: formatTime(addMins(current, 18)),
-            isMajor: false,
-            desc: "Regional Connector"
-        });
-        current = addMins(current, 18);
-
-        const waitJunction = 12;
-        legs.push({
-            type: 'transfer',
-            at: junctionName,
-            wait: waitJunction,
-            desc: "Rapid Transfer via Central Gate",
-            isMajor: false
-        });
-        current = addMins(current, waitJunction);
-
-        legs.push({
-            type: 'train',
-            from: junctionName,
-            to: activeDataset.hubStation,
-            line: 'Express connecting to ' + activeDataset.hubStation,
-            dep: formatTime(current),
-            arr: formatTime(addMins(current, 48)),
-            isMajor: true,
-            desc: "High-Speed Rail Link"
-        });
-        current = addMins(current, 48);
-
-        const waitSync = 15;
+        // 1. Initial Synchronized Transfer (at the Hub)
+        // We assume the user is arriving at the hub via a mainline service
         legs.push({
             type: 'transfer',
             at: activeDataset.hubStation,
-            wait: waitSync,
-            desc: "Synchronized Rural Boarding",
-            isMajor: true
+            wait: 15,
+            desc: "Regional Mainline Arrival & Sync",
+            isMajor: true,
+            dep: formatTime(current),
+            arr: formatTime(addMins(current, 15))
         });
-        current = addMins(current, waitSync);
+        current = addMins(current, 15);
 
+        // 2. Final Mile (GTFS Synchronized)
         legs.push({
-            type: 'bus',
+            type: 'van',
             from: activeDataset.hubStation,
             to: planner.toStop.name,
             line: activeDataset.rules['r1']?.desc || 'Rural Sync Bus',
             dep: formatTime(current),
             arr: formatTime(addMins(current, 25)),
             isMajor: true,
-            desc: "On-Demand Transit"
+            desc: "On-Demand Last Mile",
+            cost: 500
         });
 
         return legs;
-    }, [planner.from, activeDataset, planner.toStop, tokyoHubs]);
+    }, [activeDataset, planner.toStop]);
 
     const SearchableSelect = ({ label, value, options, onChange, placeholder, disabled }) => {
         const [isOpen, setIsOpen] = useState(false);
@@ -393,35 +475,98 @@ export default function App() {
         );
     };
 
+    const LegItem = ({ leg, idx, total, isSub = false }) => {
+        if (leg.type === 'transfer') {
+            return (
+                <div className="flex gap-4 items-center py-2">
+                    <div className="w-8 flex justify-center">
+                        <div className="w-0.5 h-10 border-l border-dashed border-slate-700"></div>
+                    </div>
+                    <div className="bg-slate-800/40 px-3 py-2 rounded-xl border border-slate-700/30 flex-1 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <Clock size={12} className="text-blue-400" />
+                            <div>
+                                <p className="text-[10px] font-bold text-slate-300 leading-none">{leg.desc}</p>
+                                <p className="text-[9px] font-bold text-slate-500 uppercase mt-1">at {leg.at}</p>
+                            </div>
+                        </div>
+                        <span className="text-xs font-black text-blue-400">{leg.wait}m</span>
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <div className={`flex gap-4 ${leg.isMajor ? '' : 'opacity-60 transform scale-[0.96] origin-left'}`}>
+                <div className="flex flex-col items-center">
+                    <div className={`${isSub ? 'w-6 h-6' : 'w-8 h-8'} rounded-xl flex items-center justify-center border-2 shadow-lg ${leg.type === 'train' ? 'bg-emerald-500/10 border-emerald-400 text-emerald-400' :
+                        leg.type === 'van' ? 'bg-blue-500/10 border-blue-400 text-blue-400' :
+                            'bg-amber-500/10 border-amber-400 text-amber-400'
+                        }`}>
+                        {leg.type === 'train' && <Train size={isSub ? 12 : 16} />}
+                        {leg.type === 'bus' && <Bus size={isSub ? 12 : 16} />}
+                        {leg.type === 'van' && <Car size={isSub ? 12 : 16} />}
+                    </div>
+                    {total && idx < total - 1 && <div className="w-0.5 h-full bg-slate-800 min-h-[40px]"></div>}
+                </div>
+                <div className="flex-1 pb-6">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <div className="flex items-center gap-3">
+                                <p className={`${leg.isMajor ? 'text-lg font-black' : 'text-sm font-bold'} text-slate-100`}>
+                                    {leg.from}
+                                </p>
+                                {leg.type === 'train' && (
+                                    <span className={`bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 ${isSub ? 'text-[8px]' : 'text-[10px]'} font-black uppercase px-2 py-0.5 rounded-md tracking-widest whitespace-nowrap`}>
+                                        {leg.line}
+                                    </span>
+                                )}
+                                {leg.type === 'bus' && (
+                                    <span className={`bg-amber-500/10 border border-amber-500/30 text-amber-400 ${isSub ? 'text-[8px]' : 'text-[10px]'} font-black uppercase px-2 py-0.5 rounded-md tracking-widest whitespace-nowrap`}>
+                                        {leg.line}
+                                    </span>
+                                )}
+                            </div>
+                            <p className={`${isSub ? 'text-[8px]' : 'text-[10px]'} text-slate-500 font-bold uppercase mt-1 tracking-tighter opacity-80`}>{leg.desc}</p>
+                        </div>
+                        <div className="text-right">
+                            <p className={`font-black text-slate-100 ${isSub ? 'text-xs' : 'text-sm'} leading-none`}>{leg.dep}</p>
+                            <p className="text-[8px] font-black text-slate-500 uppercase mt-1 italic tracking-tighter">DEPARTURE</p>
+                            {leg.cost && (
+                                <p className="text-[9px] font-black text-emerald-400 mt-2 bg-emerald-400/10 px-1.5 py-0.5 rounded border border-emerald-400/20">¥{leg.cost}</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {leg.to && (
+                        <div className="mt-4 flex justify-between items-end">
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-[1px] bg-slate-700"></div>
+                                <p className={`${leg.isMajor && !isSub ? 'text-sm font-bold text-slate-400' : 'text-[10px] font-semibold text-slate-500'} italic`}>
+                                    to {leg.to}
+                                </p>
+                            </div>
+                            <div className="text-right">
+                                <p className={`font-bold text-slate-400 ${isSub ? 'text-xs' : 'text-sm'} leading-none`}>{leg.arr}</p>
+                                <p className="text-[8px] font-black text-slate-500 uppercase mt-1 italic tracking-tighter">ARRIVAL</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     const PlannerView = () => (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/50">
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="text-2xl font-black flex items-center gap-2">
-                        <Search className="text-emerald-500" /> Tokyo ➔ Rural Trip Planner
+                        <Navigation className="text-emerald-500" /> Multi-Modal Trip Planner
                     </h3>
-                    {activeDataset && (
-                        <span className="text-[10px] font-black bg-slate-100 px-3 py-1 rounded-full text-slate-500 uppercase tracking-widest">
-                            Active: {activeDataset.name}
-                        </span>
-                    )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-                    <SearchableSelect
-                        label="Tokyo Departure (Live ODPT)"
-                        value={planner.from}
-                        options={tokyoHubs}
-                        onChange={(val) => setPlanner({ ...planner, from: val })}
-                        placeholder="Select Hub Station"
-                    />
-
-                    <div className="flex justify-center pb-4 md:pb-0">
-                        <div className="bg-slate-100 p-3 rounded-full text-slate-400">
-                            <ArrowRight size={20} />
-                        </div>
-                    </div>
-
+                <div className="max-w-md mx-auto">
                     <SearchableSelect
                         label={`Rural Last-Mile ${activeDataset ? `(${activeDataset.name})` : ''}`}
                         value={planner.toStop}
@@ -443,83 +588,64 @@ export default function App() {
                                     <h4 className="text-3xl font-black mt-2">Integrated Journey</h4>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Arrival Target</p>
-                                    <p className="text-2xl font-black text-emerald-400">{itinerary[itinerary.length - 1].arr}</p>
+                                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Est. Total Fare</p>
+                                    <p className="text-2xl font-black text-emerald-400">
+                                        {itinerary.some(l => l.cost) ? `¥${itinerary.reduce((sum, leg) => sum + (leg.cost || 0), 0)}` : 'Live Data Pending'}
+                                    </p>
                                 </div>
                             </div>
 
                             <div className="space-y-4">
-                                {itinerary.map((leg, idx) => (
-                                    <div key={idx} className="relative">
-                                        {leg.type === 'transfer' ? (
-                                            <div className="flex gap-4 items-center py-2">
-                                                <div className="w-4 flex justify-center">
-                                                    <div className="w-0.5 h-10 border-l border-dashed border-slate-700"></div>
-                                                </div>
-                                                <div className="bg-slate-800/40 px-3 py-2 rounded-xl border border-slate-700/30 flex-1 flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                        <Clock size={12} className="text-blue-400" />
-                                                        <div>
-                                                            <p className="text-[10px] font-bold text-slate-300 leading-none">{leg.desc}</p>
-                                                            <p className="text-[9px] font-bold text-slate-500 uppercase mt-1">at {leg.at}</p>
-                                                        </div>
-                                                    </div>
-                                                    <span className="text-xs font-black text-blue-400">{leg.wait}m</span>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className={`flex gap-4 ${leg.isMajor ? '' : 'opacity-60 transform scale-[0.96] origin-left'}`}>
-                                                <div className="flex flex-col items-center">
-                                                    <div className={`w-4 h-4 rounded-full flex items-center justify-center border-2 ${leg.type === 'train' ? 'bg-emerald-500/20 border-emerald-400' : 'bg-amber-500/20 border-amber-400'}`}>
-                                                        <div className={`w-1.5 h-1.5 rounded-full ${leg.type === 'train' ? 'bg-emerald-400' : 'bg-amber-400'}`}></div>
-                                                    </div>
-                                                    {idx < itinerary.length - 1 && <div className="w-0.5 h-full bg-slate-800 min-h-[40px]"></div>}
-                                                </div>
-                                                <div className="flex-1 pb-6">
-                                                    <div className="flex justify-between items-start">
-                                                        <div>
-                                                            <div className="flex items-center gap-3">
-                                                                <p className={`${leg.isMajor ? 'text-lg font-black' : 'text-sm font-bold'} text-slate-100`}>
-                                                                    {leg.from}
-                                                                </p>
-                                                                {leg.type === 'train' && (
-                                                                    <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-widest whitespace-nowrap">
-                                                                        {leg.line}
-                                                                    </span>
-                                                                )}
-                                                                {leg.type === 'bus' && (
-                                                                    <span className="bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-widest whitespace-nowrap">
-                                                                        {leg.line}
-                                                                    </span>
-                                                                )}
+                                {(() => {
+                                    const firstLeg = itinerary[0];
+                                    const intermediaryLegs = itinerary.slice(1, -1).filter(l => !l.isMajor);
+                                    const finalLeg = itinerary[itinerary.length - 1];
+
+                                    return (
+                                        <>
+                                            {/* Primary Departure (Anchor) */}
+                                            <LegItem leg={firstLeg} idx={0} total={itinerary.length} />
+
+                                            {/* Middle Intermediaries (Collapsible) */}
+                                            {intermediaryLegs.length > 0 && (
+                                                <div className="relative">
+                                                    <div className="flex gap-4 ml-4">
+                                                        <div className="w-0.5 h-full bg-slate-800/20 py-2"></div>
+                                                        <button
+                                                            onClick={() => setShowIntermediary(!showIntermediary)}
+                                                            className="flex-1 flex items-center justify-between p-3 bg-slate-800/10 hover:bg-slate-800/30 rounded-xl border border-slate-700/20 transition-all mb-4 mt-1"
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="flex -space-x-1.5">
+                                                                    {intermediaryLegs.filter(l => l.type !== 'transfer').map((l, i) => (
+                                                                        <div key={i} className={`w-5 h-5 rounded-md flex items-center justify-center border border-slate-900 shadow-lg ${l.type === 'train' ? 'bg-emerald-500/80 text-white' : 'bg-amber-500/80 text-white'}`}>
+                                                                            {l.type === 'train' ? <Train size={10} /> : <Bus size={10} />}
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                                <span className="text-[9px] font-bold uppercase text-slate-500 tracking-wider">Transit Details ({intermediaryLegs.length} steps)</span>
                                                             </div>
-                                                            <p className="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-tighter opacity-80">{leg.desc}</p>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <p className="font-black text-slate-100 text-sm leading-none">{leg.dep}</p>
-                                                            <p className="text-[8px] font-black text-slate-500 uppercase mt-1 italic tracking-tighter">DEPARTURE</p>
-                                                        </div>
+                                                            <ChevronDown size={14} className={`text-slate-600 transition-transform duration-300 ${showIntermediary ? 'rotate-180' : ''}`} />
+                                                        </button>
                                                     </div>
 
-                                                    {leg.to && (
-                                                        <div className="mt-4 flex justify-between items-end">
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="w-4 h-[1px] bg-slate-700"></div>
-                                                                <p className={`${leg.isMajor ? 'text-sm font-bold text-slate-400' : 'text-[10px] font-semibold text-slate-500'} italic`}>
-                                                                    to {leg.to}
-                                                                </p>
-                                                            </div>
-                                                            <div className="text-right">
-                                                                <p className="font-bold text-slate-400 text-sm leading-none">{leg.arr}</p>
-                                                                <p className="text-[8px] font-black text-slate-500 uppercase mt-1 italic tracking-tighter">ARRIVAL</p>
-                                                            </div>
+                                                    {showIntermediary && (
+                                                        <div className="space-y-4 mb-6 pl-10 border-l border-slate-800/20 animate-in slide-in-from-top-2 duration-300">
+                                                            {intermediaryLegs.map((leg, idx) => (
+                                                                <LegItem key={idx} leg={leg} isSub={true} />
+                                                            ))}
                                                         </div>
                                                     )}
                                                 </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
+                                            )}
+
+                                            {/* Primary Destination (Anchor) */}
+                                            {finalLeg && finalLeg.isMajor && (
+                                                <LegItem leg={finalLeg} idx={itinerary.length - 1} total={itinerary.length} />
+                                            )}
+                                        </>
+                                    );
+                                })()}
                             </div>
 
                             <button className="w-full mt-8 bg-emerald-500 hover:bg-emerald-400 text-white py-5 rounded-2xl font-black transition-all flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 active:scale-[0.98]">
@@ -557,8 +683,8 @@ export default function App() {
             ) : (
                 <div className="bg-white p-16 rounded-[3rem] border-2 border-dashed border-slate-200 text-center">
                     <Upload className="mx-auto mb-6 text-slate-300" size={48} />
-                    <h4 className="text-xl font-black text-slate-800 mb-2">Ready for Ingestion</h4>
-                    <p className="text-slate-400 font-bold max-w-sm mx-auto">Upload agency.txt and stops.txt to activate rural system integration.</p>
+                    <h4 className="text-xl font-black text-slate-800 mb-2">Ready for Ingest</h4>
+                    <p className="text-slate-400 font-bold max-w-sm mx-auto">Upload regional GTFS files to activate synchronization engine.</p>
                 </div>
             )}
         </div>
@@ -602,7 +728,13 @@ export default function App() {
                         {datasets.map((ds, idx) => (
                             <button
                                 key={ds.id}
-                                onClick={() => { setActiveDatasetIndex(idx); setView('planner'); }}
+                                onClick={() => {
+                                    setActiveDatasetIndex(idx);
+                                    if (ds.stops && ds.stops.length > 0) {
+                                        setPlanner(p => ({ ...p, toStop: ds.stops[0] }));
+                                        setSelectedPoint(ds.stops[0]);
+                                    }
+                                }}
                                 className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${activeDatasetIndex === idx ? 'bg-emerald-500 text-white' : 'hover:bg-slate-800/50'}`}
                             >
                                 <div className="flex items-center gap-3 overflow-hidden">
@@ -625,7 +757,7 @@ export default function App() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 lg:ml-72 p-6 md:p-12 max-w-6xl mx-auto">
+            <main className="flex-1 lg:ml-72 p-6 md:p-12 max-w-7xl mx-auto">
                 <header className="flex justify-between items-center mb-12">
                     <div>
                         <h2 className="text-4xl font-black text-slate-900 tracking-tight">
@@ -639,8 +771,8 @@ export default function App() {
 
                 {view === 'planner' ? <PlannerView /> : (
                     activeDataset ? (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in duration-500">
-                            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-500">
+                            <div className="lg:col-span-1 space-y-2 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
                                 <h4 className="px-4 font-black text-slate-400 uppercase text-[10px] tracking-widest sticky top-0 bg-slate-50 py-2 z-10">
                                     Ingested Stops ({activeDataset.stops.length})
                                 </h4>
@@ -648,28 +780,28 @@ export default function App() {
                                     <div
                                         key={stop.id}
                                         onClick={() => setSelectedPoint(stop)}
-                                        className={`p-6 rounded-[2rem] border-2 transition-all cursor-pointer ${selectedPoint?.id === stop.id ? 'border-emerald-500 bg-white shadow-2xl scale-[1.02]' : 'border-transparent bg-white hover:border-slate-200'}`}
+                                        className={`p-3 rounded-2xl border-2 transition-all cursor-pointer ${selectedPoint?.id === stop.id ? 'border-emerald-500 bg-white shadow-lg' : 'border-transparent bg-white hover:border-slate-100'}`}
                                     >
                                         <div className="flex justify-between items-center">
-                                            <div className="flex gap-5 items-center">
-                                                <div className={`p-4 rounded-2xl transition-colors ${selectedPoint?.id === stop.id ? 'bg-emerald-50 text-emerald-500' : 'bg-slate-50 text-slate-400'}`}>
-                                                    <Bus size={24} />
+                                            <div className="flex gap-3 items-center overflow-hidden">
+                                                <div className={`p-2 rounded-xl transition-colors shrink-0 ${selectedPoint?.id === stop.id ? 'bg-emerald-50 text-emerald-500' : 'bg-slate-50 text-slate-400'}`}>
+                                                    <Bus size={16} />
                                                 </div>
-                                                <div>
-                                                    <h5 className="font-black text-xl text-slate-900">{stop.name}</h5>
-                                                    <div className="flex items-center gap-3 mt-1 text-slate-400">
-                                                        <span className="text-xs font-bold flex items-center gap-1"><Clock size={12} /> {stop.window}</span>
-                                                        <span className="text-[10px] font-black bg-emerald-50 px-2 py-0.5 rounded text-emerald-600 uppercase">Flex Points</span>
+                                                <div className="overflow-hidden">
+                                                    <h5 className="font-black text-sm text-slate-900 truncate">{stop.name}</h5>
+                                                    <div className="flex items-center gap-2 mt-0.5 text-slate-400">
+                                                        <span className="text-[10px] font-bold flex items-center gap-1 uppercase tracking-tighter"><Clock size={10} /> {stop.window}</span>
+                                                        <span className="text-[8px] font-black bg-emerald-50 px-1.5 py-0.5 rounded text-emerald-600 uppercase whitespace-nowrap">Flex Points</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            {selectedPoint?.id === stop.id && <Navigation2 size={20} className="text-emerald-500 animate-pulse" />}
+                                            {selectedPoint?.id === stop.id && <Navigation2 size={14} className="text-emerald-500 shrink-0" />}
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
-                            <div className="bg-white p-4 rounded-[3rem] border border-slate-200 h-[70vh] shadow-2xl relative overflow-hidden group">
+                            <div className="lg:col-span-2 bg-white p-4 rounded-[3rem] border border-slate-200 h-[70vh] shadow-2xl relative overflow-hidden group">
                                 <MapContainer
                                     center={[activeDataset.stops[0]?.lat || 35.6895, activeDataset.stops[0]?.lon || 139.6917]}
                                     zoom={13}
