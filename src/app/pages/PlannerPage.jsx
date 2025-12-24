@@ -11,7 +11,8 @@ export default function PlannerPage({
     liveRouteData,
     setPlanner,
     showIntermediary,
-    setShowIntermediary
+    setShowIntermediary,
+    onBook
 }) {
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -132,7 +133,23 @@ export default function PlannerPage({
                                 })()}
                             </div>
 
-                            <button className="w-full mt-8 bg-emerald-500 hover:bg-emerald-400 text-white py-5 rounded-2xl font-black transition-all flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 active:scale-[0.98]">
+                            <button
+                                onClick={() => {
+                                    const vanLeg = itinerary[itinerary.length - 1];
+                                    onBook({
+                                        type: 'planner',
+                                        from: vanLeg.from,
+                                        to: vanLeg.to,
+                                        date: planner.departDate,
+                                        departureTime: vanLeg.dep,
+                                        arrivalTime: vanLeg.arr,
+                                        noticePeriod: activeDataset?.rules?.[planner.toStop.ruleId]?.notice || '30',
+                                        cost: itinerary.reduce((sum, leg) => sum + (leg.cost || 0), 0),
+                                        provider: activeDataset?.rules?.['r1']?.desc || 'Rural Sync Provider'
+                                    });
+                                }}
+                                className="w-full mt-8 bg-emerald-500 hover:bg-emerald-400 text-white py-5 rounded-2xl font-black transition-all flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 active:scale-[0.98]"
+                            >
                                 Confirm Sync & Book <ChevronRight size={20} />
                             </button>
                         </div>

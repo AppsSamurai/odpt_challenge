@@ -48,7 +48,8 @@ const icons = {
 export default function ExplorePage({
     activeDataset,
     selectedPoint,
-    setSelectedPoint
+    setSelectedPoint,
+    onBook
 }) {
     const [pickup, setPickup] = useState(null);
     const [dropoff, setDropoff] = useState(null);
@@ -98,7 +99,20 @@ export default function ExplorePage({
     const handleRequest = () => {
         if (!pickup || !dropoff) return;
         setIsRequesting(true);
-        setTimeout(() => setIsRequesting(false), 3000);
+        setTimeout(() => {
+            setIsRequesting(false);
+            onBook({
+                type: 'explore',
+                from: pickup.name,
+                to: dropoff.name,
+                date: new Date().toISOString().split('T')[0],
+                departureTime: formatTime(new Date()),
+                arrivalTime: formatTime(addMins(new Date(), 25)),
+                noticePeriod: '30',
+                cost: 500,
+                provider: activeDataset?.rules?.['r1']?.desc || 'Rural Sync Provider'
+            });
+        }, 3000);
     };
 
     const handleSwap = () => {

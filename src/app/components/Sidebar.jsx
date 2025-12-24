@@ -48,7 +48,7 @@ export default function Sidebar({
                     onClick={() => setView('explore')}
                     className={`w-full flex items-center gap-3 p-4 rounded-2xl font-bold transition-all ${view === 'explore' ? 'bg-white/10 text-white' : 'hover:bg-white/5'}`}
                 >
-                    <MapIcon size={18} /> Explore Stops
+                    <MapIcon size={18} /> Explore Regional Hubs
                 </button>
                 <div className="pt-2 pb-1 px-4">
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Analytics</p>

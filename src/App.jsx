@@ -12,6 +12,7 @@ import Sidebar from './app/components/Sidebar';
 import PlannerPage from './app/pages/PlannerPage';
 import ExplorePage from './app/pages/ExplorePage';
 import DemandAnalysisPage from './app/pages/DemandAnalysisPage';
+import BookingConfirmationPage from './app/pages/BookingConfirmationPage';
 
 // Leaflet styles
 import 'leaflet/dist/leaflet.css';
@@ -41,6 +42,7 @@ function AppContent() {
     const [plannerTimeFilter, setPlannerTimeFilter] = useState('all');
     const [selectedPoint, setSelectedPoint] = useState(null);
     const [showIntermediary, setShowIntermediary] = useState(false);
+    const [bookingDetails, setBookingDetails] = useState(null);
 
     const activeDataset = datasets[activeDatasetIndex] || null;
 
@@ -450,12 +452,20 @@ function AppContent() {
                             activeDataset={activeDataset} planner={planner} itinerary={itinerary}
                             liveRouteData={liveRouteData} setPlanner={setPlanner}
                             showIntermediary={showIntermediary} setShowIntermediary={setShowIntermediary}
+                            onBook={(details) => {
+                                setBookingDetails(details);
+                                navigate('/confirmation');
+                            }}
                         />
                     } />
                     <Route path="/explore" element={
                         <ExplorePage
                             activeDataset={activeDataset}
                             selectedPoint={selectedPoint} setSelectedPoint={setSelectedPoint}
+                            onBook={(details) => {
+                                setBookingDetails(details);
+                                navigate('/confirmation');
+                            }}
                         />
                     } />
                     <Route path="/insights" element={
@@ -464,6 +474,12 @@ function AppContent() {
                             selectedPoint={selectedPoint} setSelectedPoint={setSelectedPoint}
                             demandStats={demandStats} pointStats={pointStats}
                             plannerTimeFilter={plannerTimeFilter} setPlannerTimeFilter={setPlannerTimeFilter}
+                        />
+                    } />
+                    <Route path="/confirmation" element={
+                        <BookingConfirmationPage
+                            bookingDetails={bookingDetails}
+                            onBack={() => navigate(-1)}
                         />
                     } />
                     <Route path="*" element={<Navigate to="/planner" replace />} />
