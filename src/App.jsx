@@ -346,20 +346,69 @@ function AppContent() {
 
     const itinerary = useMemo(() => {
         if (!activeDataset || !planner.toStop) return null;
+
         const now = new Date();
-        const start = addMins(now, 5);
         const delayMins = liveRouteData.delay || 0;
+
+        // 1. Pickup the "Correct" start time from the live timetable if available
+        let departureTime = addMins(now, 10); // Default 10 mins from now
+        if (liveRouteData.schedules && liveRouteData.schedules.length > 0) {
+            const table = liveRouteData.schedules[0]["odpt:stationTimetableObject"];
+            if (table) {
+                const currentHour = now.getHours();
+                const currentMin = now.getMinutes();
+                const nextTrain = table.find(t => {
+                    const [h, m] = t["odpt:departureTime"].split(':').map(Number);
+                    return h > currentHour || (h === currentHour && m > currentMin + 5);
+                });
+                if (nextTrain) {
+                    const [nh, nm] = nextTrain["odpt:departureTime"].split(':').map(Number);
+                    departureTime = new Date(now);
+                    departureTime.setHours(nh, nm, 0, 0);
+                }
+            }
+        }
+
         const legs = [];
-        let current = start;
+        let current = departureTime;
 
-        legs.push({
-            type: 'train', from: planner.from.name, to: activeDataset.hubStation,
-            line: planner.from.lines?.[0] || 'Mainline', dep: formatTime(current),
-            arr: formatTime(addMins(current, 110 + delayMins)), isMajor: true,
-            desc: delayMins > 0 ? `Mainline Delayed (+${delayMins}m)` : "Mainline Service", delay: delayMins
-        });
-        current = addMins(current, 110 + delayMins);
+        // 2. Identify if a transit/transfer is needed based on the city
+        // High-level heuristic: Shinkansen terminals often need a local transfer to reach the rural "destination train station"
+        const needsTransfer = (planner.from.name.includes('Tokyo') && !activeDataset.hubStation.includes('Tokyo')) ||
+            (planner.from.name.includes('Shinjuku') && !['Hakuba', 'Kawagoe'].includes(activeDataset.name));
 
+        const transitStation = needsTransfer ? (activeDataset.name === 'tamamura' || activeDataset.name === 'annaka' ? 'Takasaki' : 'Nagano') : null;
+
+        if (needsTransfer && transitStation) {
+            // Leg 1: Major Express/Shinkansen to Transit Hub
+            legs.push({
+                type: 'train', from: planner.from.name, to: transitStation,
+                line: planner.from.lines?.[0] || 'Shinkansen', dep: formatTime(current),
+                arr: formatTime(addMins(current, 55 + delayMins)), isMajor: true,
+                desc: delayMins > 0 ? `Express Delayed (+${delayMins}m)` : "Mainline Express", delay: delayMins
+            });
+            current = addMins(current, 55 + delayMins);
+
+            // Leg 2: Transit Detail (Local Train to Destination Station)
+            legs.push({
+                type: 'train', from: transitStation, to: activeDataset.hubStation,
+                line: 'Local Line', dep: formatTime(addMins(current, 10)),
+                arr: formatTime(addMins(current, 35)), isMajor: false,
+                desc: "Regional Connection", delay: 0
+            });
+            current = addMins(current, 35);
+        } else {
+            // Direct Trip (Normal)
+            legs.push({
+                type: 'train', from: planner.from.name, to: activeDataset.hubStation,
+                line: planner.from.lines?.[0] || 'Mainline', dep: formatTime(current),
+                arr: formatTime(addMins(current, 110 + delayMins)), isMajor: true,
+                desc: delayMins > 0 ? `Mainline Delayed (+${delayMins}m)` : "Mainline Service", delay: delayMins
+            });
+            current = addMins(current, 110 + delayMins);
+        }
+
+        // Leg 3: Final Transfer (Sync Point)
         legs.push({
             type: 'transfer', at: activeDataset.hubStation, wait: 15,
             desc: delayMins > 0 ? "Connection Guard: Resyncing" : "Regional Sync Arrival",
@@ -368,20 +417,20 @@ function AppContent() {
         });
         current = addMins(current, 15);
 
+        // Leg 4: Last Mile On-Demand
+        // Calculate dynamic fare if available (Train + Base Van Fare)
+        const trainFare = liveRouteData.fares?.[0]?.["odpt:fare"] || 1200;
+        const totalFare = trainFare + 500;
+
         legs.push({
-            type: 'van',
-            from: activeDataset.hubStation,
-            to: planner.toStop.name,
+            type: 'van', from: activeDataset.hubStation, to: planner.toStop.name,
             line: activeDataset.rules?.['r1']?.desc || 'Rural Sync Bus',
-            dep: formatTime(current),
-            arr: formatTime(addMins(current, 25)),
-            isMajor: true,
-            desc: "On-Demand Last Mile",
-            cost: 500,
-            delay: delayMins
+            dep: formatTime(current), arr: formatTime(addMins(current, 25)),
+            isMajor: true, desc: "On-Demand Last Mile", cost: totalFare, delay: delayMins
         });
+
         return legs;
-    }, [activeDataset, planner.toStop, liveRouteData.delay, planner.from]);
+    }, [activeDataset, planner.toStop, liveRouteData, planner.from]);
 
     return (
         <div className="min-h-screen bg-slate-50 font-['Outfit'] antialiased">
