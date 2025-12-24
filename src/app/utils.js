@@ -20,6 +20,15 @@ export const HUB_MAPPING = {
     'tomioka': 'Joshu-Tomioka'
 };
 
+export const REGIONAL_DEFAULTS = {
+    'tamamura': 'odpt.Station:JR-East.Takasaki.Ueno',
+    'showa': 'odpt.Station:JR-East.Takasaki.Ueno',
+    'annaka': 'odpt.Station:JR-East.HokurikuShinkansen.Tokyo',
+    'hakuba': 'odpt.Station:JR-East.Chuo.Shinjuku',
+    'hakuba2': 'odpt.Station:JR-East.Chuo.Shinjuku',
+    'tomioka': 'odpt.Station:JR-East.Takasaki.Ueno'
+};
+
 export const parseCSV = (text) => {
     if (!text) return [];
     const cleanText = text.replace(/^\ufeff/, '');

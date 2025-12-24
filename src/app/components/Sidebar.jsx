@@ -10,6 +10,7 @@ import {
     CheckCircle2,
     BarChart3
 } from 'lucide-react';
+import { REGIONAL_DEFAULTS, INITIAL_HUBS } from '../utils';
 
 export default function Sidebar({
     view,
@@ -94,7 +95,14 @@ export default function Sidebar({
                             onClick={() => {
                                 setActiveDatasetIndex(idx);
                                 if (ds.stops && ds.stops.length > 0) {
-                                    setPlanner(p => ({ ...p, toStop: ds.stops[0] }));
+                                    const defaultOriginId = REGIONAL_DEFAULTS[ds.name];
+                                    const suggestedOrigin = INITIAL_HUBS.find(h => h.id === defaultOriginId);
+
+                                    setPlanner(prev => ({
+                                        ...prev,
+                                        toStop: ds.stops[0],
+                                        from: suggestedOrigin || prev.from
+                                    }));
                                     setSelectedPoint(ds.stops[0]);
                                 }
                             }}
