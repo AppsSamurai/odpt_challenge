@@ -98,21 +98,17 @@ export default function ExplorePage({
 
     const handleRequest = () => {
         if (!pickup || !dropoff) return;
-        setIsRequesting(true);
-        setTimeout(() => {
-            setIsRequesting(false);
-            onBook({
-                type: 'explore',
-                from: pickup.name,
-                to: dropoff.name,
-                date: new Date().toISOString().split('T')[0],
-                departureTime: formatTime(new Date()),
-                arrivalTime: formatTime(addMins(new Date(), 25)),
-                noticePeriod: '30',
-                cost: 500,
-                provider: activeDataset?.rules?.['r1']?.desc || 'Rural Sync Provider'
-            });
-        }, 3000);
+        onBook({
+            type: 'explore',
+            from: pickup.name,
+            to: dropoff.name,
+            date: new Date().toISOString().split('T')[0],
+            departureTime: formatTime(new Date()),
+            arrivalTime: formatTime(addMins(new Date(), 25)),
+            noticePeriod: '30',
+            cost: 500,
+            provider: activeDataset?.rules?.['r1']?.desc || 'Rural Sync Provider'
+        });
     };
 
     const handleSwap = () => {
@@ -176,11 +172,11 @@ export default function ExplorePage({
                         {isRequesting ? (
                             <>
                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                Syncing Regional Schedule...
+                                Syncing...
                             </>
                         ) : (
                             <>
-                                <Zap size={18} fill="currentColor" /> Request Multi-Modal Sync
+                                <Zap size={18} fill="currentColor" /> Confirm Now
                             </>
                         )}
                     </button>
