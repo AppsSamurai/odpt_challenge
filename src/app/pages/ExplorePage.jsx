@@ -15,6 +15,7 @@ import { MapContainer, TileLayer, Popup, Marker, Polyline } from 'react-leaflet'
 import L from 'leaflet';
 import { ChangeView } from '../components/MapComponents';
 import SearchableSelect from '../components/SearchableSelect';
+import { formatTime, addMins } from '../utils';
 
 // Fix for default Leaflet marker icons in Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -98,6 +99,13 @@ export default function ExplorePage({
 
     const handleRequest = () => {
         if (!pickup || !dropoff) return;
+
+        // Get fare from additional info or use default
+        const fare = activeDataset?.additionalInfo?.usage_fee?.standard_fare?.adult_standard ||
+            activeDataset?.additionalInfo?.usage_fee?.standard_fare?.adult ||
+            activeDataset?.additionalInfo?.usage_fee?.standard_fare?.general_adult ||
+            500;
+
         onBook({
             type: 'explore',
             from: pickup.name,
@@ -106,8 +114,9 @@ export default function ExplorePage({
             departureTime: formatTime(new Date()),
             arrivalTime: formatTime(addMins(new Date(), 25)),
             noticePeriod: '30',
-            cost: 500,
-            provider: activeDataset?.rules?.['r1']?.desc || 'Rural Sync Provider'
+            cost: fare,
+            provider: activeDataset?.rules?.['r1']?.desc || 'Rural Sync Provider',
+            serviceName: activeDataset?.additionalInfo?.service_name
         });
     };
 
@@ -124,7 +133,7 @@ export default function ExplorePage({
                     Explore Regional Hubs
                 </h2>
                 <p className="text-slate-500 font-bold mt-1">
-                    {activeDataset ? `Accessing ${activeDataset.stops?.length || 0} GTFS-Flex pickup points in ${activeDataset.name}` : 'Select a regional dataset to begin exploration.'}
+                    {activeDataset ? `Accessing ${activeDataset.stops?.length || 0} GTFS-Flex pickup points in ${activeDataset.additionalInfo?.service_name || activeDataset.name}` : 'Select a regional dataset to begin exploration.'}
                 </p>
             </header>
 

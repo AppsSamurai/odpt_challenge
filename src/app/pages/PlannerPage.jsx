@@ -46,7 +46,7 @@ export default function PlannerPage({
                     />
 
                     <SearchableSelect
-                        label={`Rural Last-Mile ${activeDataset ? `(${activeDataset.name})` : ''}`}
+                        label={`Rural Last-Mile ${activeDataset ? `(${activeDataset.additionalInfo?.service_name || activeDataset.name})` : ''}`}
                         value={planner.toStop}
                         options={activeDataset?.stops || []}
                         onChange={(val) => setPlanner(prev => ({ ...prev, toStop: val }))}
@@ -145,7 +145,8 @@ export default function PlannerPage({
                                         arrivalTime: vanLeg.arr,
                                         noticePeriod: activeDataset?.rules?.[planner.toStop.ruleId]?.notice || '30',
                                         cost: itinerary.reduce((sum, leg) => sum + (leg.cost || 0), 0),
-                                        provider: activeDataset?.rules?.['r1']?.desc || 'Rural Sync Provider'
+                                        provider: activeDataset?.rules?.['r1']?.desc || 'Rural Sync Provider',
+                                        serviceName: activeDataset?.additionalInfo?.service_name
                                     });
                                 }}
                                 className="w-full mt-8 bg-emerald-500 hover:bg-emerald-400 text-white py-5 rounded-2xl font-black transition-all flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 active:scale-[0.98]"

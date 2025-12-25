@@ -1,0 +1,44 @@
+{
+    "service_name": "Sakai City AI Demand Bus (Iko-sa)",
+    "operating_hours": "08:00 - 17:00",
+    "operating_days": "Monday to Friday (Closed: Weekends, Public Holidays, and Year-end/New Year holidays)",
+    "telephone_number_for_reservation": "0776-50-3330",
+    "usage_fee": {
+        "standard_fare": {
+            "adult": 500,
+            "elementary_student": 250
+        },
+        "discounted_fare": {
+            "eligible_groups": [
+                "Seniors (65+ with 'Iko-sa' card)",
+                "Disability certificate holders",
+                "Infants (Free with adult)"
+            ],
+            "fare_per_ride": 250
+        },
+        "passes": {
+            "note": "A discounted 'Iko-sa' card registration is required for senior pricing."
+        }
+    },
+    "reservation_methods": [
+        {
+            "method": "Smartphone App (SAVS)",
+            "allowed_to": "Everyone (Registration required via app)",
+            "availability": "24 hours a day",
+            "note": "The most efficient way to book and track the bus location in real-time."
+        },
+        {
+            "method": "Telephone",
+            "allowed_to": "Everyone",
+            "availability": "08:00 - 16:30 (Weekdays)",
+            "note": "Call the dedicated reservation center; avoid busy morning hours if possible."
+        }
+    ],
+    "reservation_window": "From 1 week in advance until 30 minutes before boarding",
+    "additional_info_page": "https://www.city.fukui-sakai.lg.jp/kokyokotsu/kurashi/toshi-keikaku/kotsu/on-demand.html",
+    "important_notes": [
+        "This is an AI-optimized routing system; pickup times may shift slightly.",
+        "Registration is required for all users either via the app or by submitting a paper form.",
+        "Operating area covers the Mikuni and Maruoka regions primarily."
+    ]
+}

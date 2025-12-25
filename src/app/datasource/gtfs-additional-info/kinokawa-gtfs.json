@@ -1,0 +1,53 @@
+{
+    "service_name": "Kinokawa City Demand Shared Transport (Nori Nori Kotsu)",
+    "operating_hours": "08:30 - 16:30",
+    "operating_days": "Monday to Saturday (Closed: Sundays, Public Holidays, and Year-end/New Year holidays Dec 29 – Jan 3)",
+    "telephone_number_for_reservation": "0120-203-055",
+    "usage_fee": {
+        "standard_fare": {
+            "general": 300,
+            "elementary_junior_high_disability": 200
+        },
+        "discounted_fare": {
+            "eligible_groups": [
+                "Elementary school students",
+                "Junior high school students",
+                "Physical/Mental Disability Certificate holders",
+                "Caregivers of disability certificate holders (limit 1 per holder)"
+            ],
+            "fare_per_ride": 200
+        },
+        "passes": {
+            "note": "Specific digital passes or multi-ride tickets were not detailed in the provided leaflet/page."
+        }
+    },
+    "reservation_methods": [
+        {
+            "method": "Smartphone App (MONET)",
+            "allowed_to": "Everyone (requires prior registration)",
+            "availability": "24 hours a day, 365 days a year",
+            "note": "Reservations accepted from 1 week prior up to 30 minutes before boarding."
+        },
+        {
+            "method": "LINE (Kinokawa City Official Account)",
+            "allowed_to": "Everyone (requires prior registration)",
+            "availability": "24 hours a day, 365 days a year",
+            "note": "Reservations accepted from 1 week prior up to 30 minutes before boarding."
+        },
+        {
+            "method": "Telephone",
+            "allowed_to": "Everyone (requires prior registration)",
+            "availability": "Monday to Saturday, 08:30 - 16:30",
+            "note": "Reservations accepted from 1 week prior up to 30 minutes before boarding."
+        }
+    ],
+    "reservation_window": "From 1 week in advance until 30 minutes before the scheduled ride",
+    "additional_info_page": "https://www.city.kinokawa.lg.jp/007/2024-1119-drt070108.html",
+    "important_notes": [
+        "Prior user registration is required (via form at City Hall/branches or via the app).",
+        "Registration process can take approximately 2 weeks.",
+        "Vehicles are 10-seater vans (capacity for 9 passengers).",
+        "Cancellations must be made at least 30 minutes before the scheduled departure time.",
+        "Ski/Snowboard equipment policies and home-specific drop-offs follow zone-based operation rules."
+    ]
+}

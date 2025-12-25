@@ -1,0 +1,52 @@
+{
+    "service_name": "Tomioka City Demand Shared Taxi (Ai-Taku)",
+    "operating_hours": "08:00 - 17:00",
+    "operating_days": "365 days a year (Daily)",
+    "telephone_number_for_reservation": "0274-63-8500",
+    "usage_fee": {
+        "standard_fare": {
+            "residents_workers_students": 100,
+            "others_tourists": 500
+        },
+        "discounted_fare": {
+            "eligible_groups": [
+                "Elementary school students",
+                "Disability certificate holders (including one caregiver)",
+                "Residents/Workers/Students in Tomioka City (requires 'Ai-Taku Card' after first ride)"
+            ],
+            "fare_per_ride": 100
+        },
+        "passes": {
+            "pre_school_children": "Free"
+        }
+    },
+    "reservation_methods": [
+        {
+            "method": "Smartphone App",
+            "allowed_to": "Everyone",
+            "availability": "24 hours a day",
+            "note": "Reservations accepted from 5 days prior up to 20 minutes before boarding."
+        },
+        {
+            "method": "LINE (Tomioka City Official Account)",
+            "allowed_to": "Everyone",
+            "availability": "24 hours a day",
+            "note": "Recommended for simple operations. Notifications are sent directly to the talk room."
+        },
+        {
+            "method": "Telephone",
+            "allowed_to": "Everyone",
+            "availability": "07:00 - 18:00",
+            "note": "Mandatory for wheelchair users. Reservations accepted from 5 days prior up to 20 minutes before boarding."
+        }
+    ],
+    "reservation_window": "From 5 days in advance until 20 minutes before the scheduled ride",
+    "additional_info_page": "https://www.city.tomioka.lg.jp/www/contents/1555568319243/index.html",
+    "important_notes": [
+        "Wheelchair users must book by phone. Effective April 2025, wheelchair bookings must be made at least 2 days in advance.",
+        "Users eligible for the 100 yen fare must present ID on their first ride to receive an 'Ai-Taku Card'.",
+        "Large luggage that occupies an extra seat is not permitted.",
+        "Pets are allowed only in carry bags small enough to fit on your lap.",
+        "The taxi will not wait if you are not at the stop at the reserved time."
+    ]
+}

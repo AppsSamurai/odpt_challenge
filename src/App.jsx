@@ -112,6 +112,22 @@ function AppContent() {
             const hubLon = stops.reduce((sum, s) => sum + s.lon, 0) / stops.length;
             const hubStation = areaName.charAt(0).toUpperCase() + areaName.slice(1) + " Station";
 
+            // Load additional info JSON if available
+            let additionalInfo = null;
+            const validDatasets = ['hakuba', 'hakuba2', 'tomioka', 'annaka', 'sakai', 'tamamura', 'showa', 'kawagoe', 'hirakawa', 'kinokawa'];
+
+            if (validDatasets.includes(areaName)) {
+                try {
+                    const infoModule = await import(`./app/datasource/gtfs-additional-info/${areaName}-gtfs.json`);
+                    if (infoModule.default && Object.keys(infoModule.default).length > 0) {
+                        additionalInfo = infoModule.default;
+                        console.log(`✅ Loaded additional info for ${areaName}`);
+                    }
+                } catch (e) {
+                    console.log(`⚠️ Additional info not available for ${areaName}`);
+                }
+            }
+
             const newDataset = {
                 name: areaName,
                 id: 'area-' + Date.now() + Math.random(),
@@ -119,7 +135,8 @@ function AppContent() {
                 hubLat, hubLon,
                 stops: stops,
                 rules: rules,
-                demandData: demandData
+                demandData: demandData,
+                additionalInfo: additionalInfo
             };
 
             setDatasets(prev => {
@@ -422,7 +439,14 @@ function AppContent() {
         // Leg 4: Last Mile On-Demand
         // Calculate dynamic fare if available (Train + Base Van Fare)
         const trainFare = liveRouteData.fares?.[0]?.["odpt:fare"] || 1200;
-        const totalFare = trainFare + 500;
+
+        // Get van fare from additional info or use default
+        const vanFare = activeDataset?.additionalInfo?.usage_fee?.standard_fare?.adult_standard ||
+            activeDataset?.additionalInfo?.usage_fee?.standard_fare?.adult ||
+            activeDataset?.additionalInfo?.usage_fee?.standard_fare?.general_adult ||
+            500;
+
+        const totalFare = trainFare + vanFare;
 
         legs.push({
             type: 'van', from: activeDataset.hubStation, to: planner.toStop.name,

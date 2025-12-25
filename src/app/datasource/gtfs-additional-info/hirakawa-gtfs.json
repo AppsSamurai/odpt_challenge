@@ -1,0 +1,51 @@
+{
+    "service_name": "Hirakawa City Demand Transport (Norassa)",
+    "operating_hours": "08:30 - 18:00",
+    "operating_days": "Monday to Friday (Closed: Weekends, Public Holidays, and Year-end/New Year holidays Dec 29 – Jan 3)",
+    "telephone_number_for_reservation": "0172-55-5023",
+    "usage_fee": {
+        "standard_fare": {
+            "adult_general": 300,
+            "high_school_student": 300
+        },
+        "discounted_fare": {
+            "eligible_groups": [
+                "Elementary and Junior High school students",
+                "Disability certificate holders",
+                "Seniors (presumed, check local Ai-Taku equivalent cards)",
+                "Preschoolers (Free)"
+            ],
+            "fare_per_ride": 100
+        },
+        "passes": {
+            "note": "Digital tickets and multi-ride passes may be available via the MONET app."
+        }
+    },
+    "reservation_methods": [
+        {
+            "method": "Smartphone App (MONET)",
+            "allowed_to": "Everyone",
+            "availability": "24 hours a day",
+            "note": "Reservations accepted from 1 week prior until 30 minutes before boarding."
+        },
+        {
+            "method": "LINE (Hirakawa City Official Account)",
+            "allowed_to": "Everyone",
+            "availability": "24 hours a day",
+            "note": "Reservations accepted from 1 week prior until 30 minutes before boarding."
+        },
+        {
+            "method": "Telephone",
+            "allowed_to": "Everyone",
+            "availability": "08:30 - 18:00 (Operating days)",
+            "note": "Call the Norassa Reservation Center. Busy hours are typically in the morning."
+        }
+    ],
+    "reservation_window": "From 1 week in advance until 30 minutes before the scheduled ride",
+    "additional_info_page": "https://www.city.hirakawa.lg.jp/kurashi/koutsu/norassa.html",
+    "important_notes": [
+        "If you are not at the stop at the reserved time, the vehicle will depart to the next destination.",
+        "Users must handle their own luggage during loading/unloading.",
+        "Ride-sharing is common; arrival times may vary depending on the route."
+    ]
+}

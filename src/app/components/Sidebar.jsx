@@ -109,8 +109,8 @@ export default function Sidebar({
                             className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${activeDatasetIndex === idx ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'hover:bg-slate-800/50'}`}
                         >
                             <div className="flex items-center gap-3 overflow-hidden">
-                                <FileText size={16} />
-                                <span className="text-xs font-black truncate">{ds.name}</span>
+                                <FileText size={16} className="shrink-0" />
+                                <span className="text-xs font-black line-clamp-2 leading-tight">{ds.additionalInfo?.service_name || ds.name}</span>
                             </div>
                             <CheckCircle2 size={14} />
                         </button>

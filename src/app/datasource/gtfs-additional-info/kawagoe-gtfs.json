@@ -1,0 +1,45 @@
+{
+    "service_name": "Kawagoe Demand-type Transport (Kawamaru)",
+    "operating_hours": "08:00 - 18:00 (Reservations for 08:00-08:30 must be made by the previous day)",
+    "operating_days": "Monday to Sunday (Closed: Year-end/New Year holidays Dec 29 – Jan 3)",
+    "telephone_number_for_reservation": "049-257-8830",
+    "usage_fee": {
+        "standard_fare": {
+            "adult": 300,
+            "elementary_student": 150
+        },
+        "discounted_fare": {
+            "eligible_groups": [
+                "Elementary school students",
+                "Disability certificate holders (and 1 caregiver)",
+                "Preschoolers (Free with an adult)"
+            ],
+            "fare_per_ride": 150
+        },
+        "passes": {
+            "note": "One-day passes (500 yen for adults / 250 yen for students/disabled) and multi-ride coupons are available."
+        }
+    },
+    "reservation_methods": [
+        {
+            "method": "Internet Reservation",
+            "allowed_to": "Registered users only",
+            "availability": "24 hours a day (except maintenance)",
+            "note": "Prior user registration is mandatory and takes 10–14 days to process."
+        },
+        {
+            "method": "Telephone",
+            "allowed_to": "Registered users only",
+            "availability": "08:00 - 18:00",
+            "note": "Reservations accepted from 1 week prior. Maximum of 6 active bookings per person."
+        }
+    ],
+    "reservation_window": "From 1 week in advance until 30 minutes before boarding (or same-day)",
+    "additional_info_page": "https://www.city.kawagoe.saitama.jp/kurashi/kotsu/1003051/1003073/1003074.html",
+    "important_notes": [
+        "User registration is required before first use (submit by mail or at City Hall).",
+        "Registration takes approximately 2 weeks to complete.",
+        "Travel is restricted to within specific zones; crossing between different service zones is generally not permitted in a single ride.",
+        "Wait times may occur as this is a ride-sharing service."
+    ]
+}

@@ -1,0 +1,38 @@
+{
+    "service_name": "Tamamura Town Demand Taxi (Tamarin-go)",
+    "operating_hours": "08:30 - 17:30",
+    "operating_days": "Monday to Saturday (Closed: Sundays and Year-end/New Year holidays Dec 29 – Jan 3)",
+    "telephone_number_for_reservation": "0270-64-1111",
+    "usage_fee": {
+        "standard_fare": {
+            "general_adult": 300,
+            "children_over_7": 300
+        },
+        "discounted_fare": {
+            "eligible_groups": [
+                "Seniors (75+)",
+                "Disability certificate holders",
+                "Children under 6 (Free)"
+            ],
+            "fare_per_ride": 100
+        },
+        "passes": {
+            "note": "Ticket books (11 tickets for the price of 10) are available for purchase."
+        }
+    },
+    "reservation_methods": [
+        {
+            "method": "Telephone",
+            "allowed_to": "Registered residents only",
+            "availability": "08:00 - 17:00 (Operating days)",
+            "note": "Reservations must be made at least 30 minutes prior to use."
+        }
+    ],
+    "reservation_window": "From 1 week in advance until 30 minutes before boarding",
+    "additional_info_page": "https://www.town.tamamura.lg.jp/docs/2024072500020/",
+    "important_notes": [
+        "Users must complete a one-time registration at the Town Hall.",
+        "Pickup and drop-off are between designated 'Common Points' or private homes (for registered residents).",
+        "Wait times may occur due to the shared nature of the service."
+    ]
+}

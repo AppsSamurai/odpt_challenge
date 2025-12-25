@@ -143,7 +143,7 @@ export default function BookingConfirmationPage({
                                     </div>
                                     <div className="pt-4 border-t border-white/5 flex justify-between items-center">
                                         <span className="text-slate-400 text-[10px] font-black uppercase">Service Provider</span>
-                                        <span className="font-black text-white text-xs text-right">{provider}</span>
+                                        <span className="font-black text-white text-xs text-right">{bookingDetails.serviceName || provider}</span>
                                     </div>
                                 </div>
                             </div>
