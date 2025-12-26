@@ -62,7 +62,7 @@ export default function LegItem({ leg, idx, total, isSub = false }) {
                         </p>
                         <p className="text-[8px] font-black text-slate-500 uppercase mt-1 italic tracking-tighter">DEPARTURE</p>
                         {leg.cost && (
-                            <p className="text-[9px] font-black text-emerald-400 mt-2 bg-emerald-400/10 px-1.5 py-0.5 rounded border border-emerald-400/20">¥{leg.cost}</p>
+                            <p className="text-[9px] font-black text-emerald-400 mt-2 bg-emerald-400/10 px-1.5 py-0.5 rounded border border-emerald-400/20">¥ {leg.cost}</p>
                         )}
                     </div>
                 </div>

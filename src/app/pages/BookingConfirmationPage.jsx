@@ -9,23 +9,99 @@ import {
     ChevronLeft,
     Train,
     Bus,
+    X,
     AlertCircle
 } from 'lucide-react';
+import { addMins, formatTime } from '../utils';
 
 export default function BookingConfirmationPage({
     bookingDetails,
     onBack
 }) {
     const [isConfirmed, setIsConfirmed] = React.useState(false);
-    const [editableDate, setEditableDate] = React.useState(bookingDetails?.date || '');
-    const [editableTime, setEditableTime] = React.useState(bookingDetails?.departureTime || '');
+    const [editableDate, setEditableDate] = React.useState(bookingDetails?.date || new Date().toISOString().split('T')[0]);
+
+    // Initialize time with "Next Available" logic
+    const [editableTime, setEditableTime] = React.useState(() => {
+        const depTime = bookingDetails?.departureTime || '';
+
+        try {
+            // 1. Calculate Min Safe Time (Now + Notice)
+            const noticeMinutes = parseInt(bookingDetails?.noticePeriod || '30', 10);
+            const now = new Date();
+            // Initial Set: 40 mins from now (Notice + Buffer)
+            const minSafe = new Date(now.getTime() + 40 * 60000);
+
+            // 2. Check Operating Hours Start
+            if (bookingDetails?.operatingHours) {
+                const [startStr] = bookingDetails.operatingHours.split('-').map(s => s.trim());
+                const [h, m] = startStr.split(':').map(Number);
+                const opStart = new Date(now);
+                opStart.setHours(h, m, 0, 0);
+
+                // If minSafe is earlier than operating start (e.g. 7am vs 8am open), sync to open time
+                if (minSafe < opStart) {
+                    return formatTime(opStart);
+                }
+            }
+
+            const safeTimeStr = formatTime(minSafe);
+
+            // 3. Compare with provided time
+            // Use the initialized date (or today) for comparison
+            const targetDateStr = bookingDetails?.date || now.toISOString().split('T')[0];
+            const providedDateTime = new Date(`${targetDateStr}T${depTime}`);
+
+            // If provided time is missing or EARLIER than safe time, use safe time
+            if (!depTime || isNaN(providedDateTime.getTime()) || providedDateTime < minSafe) {
+                return safeTimeStr;
+            }
+
+            return depTime;
+        } catch (e) {
+            console.error("Time calc failed", e);
+            return depTime;
+        }
+    });
+    const [showModal, setShowModal] = React.useState(false);
 
     if (!bookingDetails) return null;
 
-    const { type, from, to, provider, noticePeriod } = bookingDetails;
+    const { type, from, to, provider, noticePeriod, cost, usageFee, operatingHours } = bookingDetails;
+
+    // Parse Operating Hours safely
+    const [opStart, opEnd] = (operatingHours || "00:00 - 23:59").split('-').map(s => s.trim());
+
+    // Validation Logic for Strict Notice Policy
+    // Validation Logic for Strict Notice Policy
+    const noticeMinutes = parseInt(noticePeriod || '30', 10);
+    const minSafeTime = new Date(new Date().getTime() + noticeMinutes * 60000);
+    const selectedDateTime = new Date(`${editableDate}T${editableTime}`);
+    const isStrictTimeValid = selectedDateTime >= minSafeTime;
+
+    // Validation for Operating Hours
+    let isWithinOperatingHours = true;
+    if (operatingHours) {
+        const [h, m] = editableTime.split(':').map(Number);
+        const [startH, startM] = opStart.split(':').map(Number);
+        const [endH, endM] = opEnd.split(':').map(Number);
+        const selectedMins = h * 60 + m;
+        const startMins = startH * 60 + startM;
+        const endMins = endH * 60 + endM;
+
+        isWithinOperatingHours = selectedMins >= startMins && selectedMins <= endMins;
+    }
+
+    const isTimeValid = isStrictTimeValid && isWithinOperatingHours;
+    const formattedMinTime = `${minSafeTime.getFullYear()}-${String(minSafeTime.getMonth() + 1).padStart(2, '0')}-${String(minSafeTime.getDate()).padStart(2, '0')} ${formatTime(minSafeTime)}`;
+
+
+
+    // Helper to format JSON keys for display
+    const formatKey = (str) => str.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
             <header className="flex items-center justify-between mb-4">
                 <div>
                     <h2 className="text-4xl font-black text-slate-900 tracking-tight flex items-center gap-4">
@@ -56,14 +132,20 @@ export default function BookingConfirmationPage({
             </header>
 
             {/* NEW: Prominent Notice Period Info */}
-            <div className="bg-amber-50 border border-amber-200 rounded-3xl p-6 flex items-center gap-4 animate-in slide-in-from-top-2 duration-500 delay-150">
-                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-amber-100 shrink-0">
-                    <AlertCircle className="text-amber-500" size={24} />
+            <div className="bg-amber-50 border-l-4 border-amber-500 rounded-r-3xl rounded-l-md p-6 flex items-center gap-4 animate-in slide-in-from-top-2 duration-500 delay-150 shadow-lg shadow-amber-500/10 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                    <AlertCircle size={100} />
                 </div>
-                <div>
-                    <p className="text-amber-800 font-black text-[10px] uppercase tracking-widest leading-none mb-1">Notice Period Required</p>
-                    <p className="text-amber-900 text-sm font-bold">
-                        This service requires a <span className="underline decoration-2 underline-offset-2 decoration-amber-500/30">{noticePeriod || '30'} minute</span> lead time. {isConfirmed ? 'Your dispatch is being monitored.' : 'The system will verify availability upon confirmation.'}
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-md border-2 border-amber-100 shrink-0 relative z-10 animate-[bounce_2s_infinite]">
+                    <AlertCircle className="text-amber-500" size={28} />
+                </div>
+                <div className="relative z-10">
+                    <p className="text-amber-600 font-black text-xs uppercase tracking-widest leading-none mb-2 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        Action Required
+                    </p>
+                    <p className="text-amber-900 text-sm font-bold leading-relaxed">
+                        Strict Notice Policy: You must book at least <span className="bg-amber-500 text-white px-1.5 py-0.5 rounded text-xs font-black mx-1 inline-block transform -skew-x-6">{noticePeriod || '30'} MINS</span> before departure.
                     </p>
                 </div>
             </div>
@@ -109,8 +191,8 @@ export default function BookingConfirmationPage({
                                 </div>
 
                                 <div className="space-y-4 bg-slate-800/40 p-6 rounded-3xl border border-white/5">
-                                    <div className="flex justify-between items-center group">
-                                        <div className="flex items-center gap-2 text-slate-400">
+                                    <div className="flex justify-between items-center group gap-4">
+                                        <div className="flex items-center gap-2 text-slate-400 shrink-0">
                                             <Calendar size={14} />
                                             <span className="text-[10px] font-black uppercase">Schedule</span>
                                         </div>
@@ -121,12 +203,12 @@ export default function BookingConfirmationPage({
                                                 type="date"
                                                 value={editableDate}
                                                 onChange={(e) => setEditableDate(e.target.value)}
-                                                className="bg-slate-800 text-white font-black text-sm px-3 py-1.5 rounded-xl border border-white/10 focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all"
+                                                className="bg-slate-800 text-white font-black text-sm px-4 py-2 rounded-xl border border-white/10 focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all text-right w-[150px]"
                                             />
                                         )}
                                     </div>
-                                    <div className="flex justify-between items-center group">
-                                        <div className="flex items-center gap-2 text-slate-400">
+                                    <div className="flex justify-between items-center group gap-4">
+                                        <div className="flex items-center gap-2 text-slate-400 shrink-0">
                                             <Clock size={14} />
                                             <span className="text-[10px] font-black uppercase">Ready By</span>
                                         </div>
@@ -137,7 +219,7 @@ export default function BookingConfirmationPage({
                                                 type="time"
                                                 value={editableTime}
                                                 onChange={(e) => setEditableTime(e.target.value)}
-                                                className="bg-slate-800 text-emerald-400 font-black text-lg px-3 py-1.5 rounded-xl border border-white/10 focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all"
+                                                className="bg-slate-800 text-emerald-400 font-black text-lg px-4 py-2 rounded-xl border border-white/10 focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all text-right w-[140px]"
                                             />
                                         )}
                                     </div>
@@ -150,12 +232,44 @@ export default function BookingConfirmationPage({
 
                             <div className="mt-12 border-t border-white/10 pt-8 flex justify-end">
                                 {!isConfirmed ? (
-                                    <button
-                                        onClick={() => setIsConfirmed(true)}
-                                        className="w-full md:w-auto px-12 py-5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-3xl font-black text-lg transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20 active:scale-95 group"
-                                    >
-                                        Confirm & Place Booking <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" />
-                                    </button>
+                                    <div className="flex flex-col items-end gap-3 w-full">
+                                        <button
+                                            onClick={() => setIsConfirmed(true)}
+                                            disabled={!isTimeValid}
+                                            className={`w-full md:w-auto px-12 py-5 rounded-3xl font-black text-lg transition-all flex items-center justify-center gap-3 shadow-xl active:scale-95 group ${isTimeValid ? 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-emerald-500/20' : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}`}
+                                        >
+                                            {isTimeValid ? (
+                                                <>
+                                                    Confirm & Place Booking <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" />
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <AlertCircle size={22} /> Notice Policy Violation
+                                                </>
+                                            )}
+                                        </button>
+                                        {!isTimeValid && (
+                                            <div className="space-y-2">
+                                                {!isStrictTimeValid && (
+                                                    <button
+                                                        onClick={() => {
+                                                            // Set to Now + 40 mins
+                                                            const safeBufferTime = new Date(new Date().getTime() + 40 * 60000);
+                                                            setEditableTime(formatTime(safeBufferTime));
+                                                        }}
+                                                        className="text-[10px] font-bold text-rose-500 bg-rose-50 px-3 py-2 rounded-xl border border-rose-100 flex items-center gap-2 animate-in slide-in-from-right-2 hover:bg-rose-100 transition-colors cursor-pointer"
+                                                    >
+                                                        <Clock size={12} /> Auto-correct
+                                                    </button>
+                                                )}
+                                                {!isWithinOperatingHours && (
+                                                    <p className="text-[10px] font-bold text-amber-600 bg-amber-50 px-3 py-2 rounded-xl border border-amber-100 flex items-center gap-2 animate-in slide-in-from-right-3">
+                                                        <AlertCircle size={12} /> Service Closed (Operating Hours: {operatingHours})
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 ) : (
                                     <div className="bg-emerald-500/10 border border-emerald-500/20 px-8 py-4 rounded-3xl flex items-center gap-4 animate-in zoom-in duration-500">
                                         <CheckCircle2 className="text-emerald-500" size={32} />
@@ -191,6 +305,18 @@ export default function BookingConfirmationPage({
                         <h4 className="font-black text-slate-900 mb-6 flex items-center gap-2">Ticket Metadata</h4>
                         <div className="space-y-4">
                             <div className="p-4 bg-slate-50 rounded-2xl">
+                                <p className="text-slate-400 text-[8px] font-black uppercase tracking-widest mb-1">Flex Transport Fare</p>
+                                <p className="font-black text-2xl text-emerald-500 leading-tight">¥ {cost}</p>
+                                {usageFee && (
+                                    <button
+                                        onClick={() => setShowModal(true)}
+                                        className="text-[10px] font-bold text-blue-500 hover:text-blue-600 mt-2 flex items-center gap-1 transition-colors"
+                                    >
+                                        View Ticket Options <ChevronLeft size={10} className="rotate-180" />
+                                    </button>
+                                )}
+                            </div>
+                            <div className="p-4 bg-slate-50 rounded-2xl">
                                 <p className="text-slate-400 text-[8px] font-black uppercase tracking-widest mb-1">Reservation ID</p>
                                 <p className="font-black text-slate-900 leading-tight">RES-{Math.random().toString(36).substring(7).toUpperCase()}</p>
                             </div>
@@ -217,6 +343,64 @@ export default function BookingConfirmationPage({
                     )}
                 </div>
             </div>
+
+            {/* Ticket Details Modal */}
+            {showModal && usageFee && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl animate-in zoom-in-95 duration-300 relative">
+                        <button
+                            onClick={() => setShowModal(false)}
+                            className="absolute top-6 right-6 p-2 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"
+                        >
+                            <X size={20} className="text-slate-500" />
+                        </button>
+
+                        <h3 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-2">
+                            <Bus className="text-emerald-500" /> Ticket Options
+                        </h3>
+
+                        <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                            {Object.entries(usageFee).map(([category, value]) => (
+                                <div key={category} className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                                    <h4 className="text-xs font-black uppercase text-slate-400 tracking-widest mb-3 border-b border-slate-200/50 pb-2">
+                                        {formatKey(category)}
+                                    </h4>
+                                    <div className="space-y-2">
+                                        {typeof value === 'object' && value !== null ? (
+                                            Object.entries(value).map(([subKey, subValue]) => (
+                                                <div key={subKey} className="flex justify-between items-start">
+                                                    <span className="text-sm font-bold text-slate-600">
+                                                        {typeof subKey === 'string' && subKey !== 'note' && isNaN(subKey) ? formatKey(subKey) : ''}
+                                                        {subKey === 'note' && <span className="text-amber-600 italic font-normal">{subValue}</span>}
+                                                        {Array.isArray(subValue) && (
+                                                            <ul className="list-disc list-inside mt-1 space-y-1">
+                                                                {subValue.map((item, i) => (
+                                                                    <li key={i} className="text-xs text-slate-500">{item}</li>
+                                                                ))}
+                                                            </ul>
+                                                        )}
+                                                    </span>
+                                                    {!Array.isArray(subValue) && typeof subValue !== 'object' && subKey !== 'note' && (
+                                                        <span className="font-black text-slate-900">
+                                                            {typeof subValue === 'number' ? `¥ ${subValue}` : subValue}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-sm text-slate-600">{value}</p>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="mt-6 pt-6 border-t border-slate-100 text-center">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase">Standard Regional Rates Apply</p>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

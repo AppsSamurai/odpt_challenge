@@ -9,7 +9,11 @@ import {
     Navigation2,
     Zap,
     Trash2,
-    ArrowRight
+    ArrowRight,
+    Info,
+    X,
+    Car,
+    Bus
 } from 'lucide-react';
 import { MapContainer, TileLayer, Popup, Marker, Polyline } from 'react-leaflet';
 import L from 'leaflet';
@@ -56,6 +60,10 @@ export default function ExplorePage({
     const [dropoff, setDropoff] = useState(null);
     const [isRequesting, setIsRequesting] = useState(false);
     const [search, setSearch] = useState("");
+    const [showInfoModal, setShowInfoModal] = useState(false);
+
+    // Helper to format JSON keys
+    const formatKey = (str) => str.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
     // Handle initial dataset loading and changes
     React.useEffect(() => {
@@ -116,7 +124,8 @@ export default function ExplorePage({
             noticePeriod: '30',
             cost: fare,
             provider: activeDataset?.rules?.['r1']?.desc || 'Rural Sync Provider',
-            serviceName: activeDataset?.additionalInfo?.service_name
+            serviceName: activeDataset?.additionalInfo?.service_name,
+            operatingHours: activeDataset?.additionalInfo?.operating_hours
         });
     };
 
@@ -138,70 +147,82 @@ export default function ExplorePage({
             </header>
 
             {/* NEW: Horizontal Request Bar */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl p-8 space-y-6 animate-in slide-in-from-top-4 duration-500">
-                <div className="flex flex-col md:flex-row items-end gap-4 w-full">
-                    <div className="flex-1 w-full translate-y-2">
-                        <SearchableSelect
-                            label="Startup Point"
-                            value={pickup}
-                            options={activeDataset?.stops || []}
-                            onChange={(val) => { setPickup(val); setSelectedPoint(val); }}
-                            placeholder="Select origin..."
-                            disabled={!activeDataset}
-                        />
-                    </div>
+            <div className="relative z-50">
+                <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl p-8 space-y-6 animate-in slide-in-from-top-4 duration-500">
+                    <div className="flex flex-col md:flex-row items-end gap-4 w-full">
+                        <div className="flex-1 w-full translate-y-2">
+                            <SearchableSelect
+                                label="Startup Point"
+                                value={pickup}
+                                options={activeDataset?.stops || []}
+                                onChange={(val) => { setPickup(val); setSelectedPoint(val); }}
+                                placeholder="Select origin..."
+                                disabled={!activeDataset}
+                            />
+                        </div>
 
-                    <button
-                        onClick={handleSwap}
-                        disabled={!pickup && !dropoff}
-                        className="mb-1 p-3 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-emerald-500 rounded-xl transition-all border border-slate-100 shadow-sm disabled:opacity-30 disabled:cursor-not-allowed group"
-                        title="Swap Start and End"
-                    >
-                        <ArrowRightLeft size={20} className="group-active:rotate-180 transition-transform duration-300" />
-                    </button>
-
-                    <div className="flex-1 w-full translate-y-2">
-                        <SearchableSelect
-                            label="Destination Point"
-                            value={dropoff}
-                            options={activeDataset?.stops || []}
-                            onChange={(val) => { setDropoff(val); setSelectedPoint(val); }}
-                            placeholder="Select destination..."
-                            disabled={!activeDataset}
-                        />
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-3 pt-2">
-                    <button
-                        onClick={handleRequest}
-                        disabled={!pickup || !dropoff || isRequesting}
-                        className={`flex-1 py-4 rounded-2xl font-black text-white flex items-center justify-center gap-2 transition-all shadow-lg ${(!pickup || !dropoff) ? 'bg-slate-200 cursor-not-allowed shadow-none' : isRequesting ? 'bg-slate-400' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 active:scale-95'}`}
-                    >
-                        {isRequesting ? (
-                            <>
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                Syncing...
-                            </>
-                        ) : (
-                            <>
-                                <Zap size={18} fill="currentColor" /> Confirm Now
-                            </>
-                        )}
-                    </button>
-                    {(pickup || dropoff) && (
                         <button
-                            onClick={() => { setPickup(null); setDropoff(null); }}
-                            className="flex items-center gap-2 px-6 py-4 bg-slate-50 text-slate-400 font-black uppercase text-[10px] hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all border border-slate-100"
+                            onClick={handleSwap}
+                            disabled={!pickup && !dropoff}
+                            className="mb-1 p-3 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-emerald-500 rounded-xl transition-all border border-slate-100 shadow-sm disabled:opacity-30 disabled:cursor-not-allowed group"
+                            title="Swap Start and End"
                         >
-                            <Trash2 size={16} /> Reset
+                            <ArrowRightLeft size={20} className="group-active:rotate-180 transition-transform duration-300" />
                         </button>
-                    )}
+
+                        <div className="flex-1 w-full translate-y-2">
+                            <SearchableSelect
+                                label="Destination Point"
+                                value={dropoff}
+                                options={activeDataset?.stops || []}
+                                onChange={(val) => { setDropoff(val); setSelectedPoint(val); }}
+                                placeholder="Select destination..."
+                                disabled={!activeDataset}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-2">
+                        <button
+                            onClick={handleRequest}
+                            disabled={!pickup || !dropoff || isRequesting}
+                            className={`flex-1 py-4 rounded-2xl font-black text-white flex items-center justify-center gap-2 transition-all shadow-lg ${(!pickup || !dropoff) ? 'bg-slate-200 cursor-not-allowed shadow-none' : isRequesting ? 'bg-slate-400' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 active:scale-95'}`}
+                        >
+                            {isRequesting ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    Syncing...
+                                </>
+                            ) : (
+                                <>
+                                    <Zap size={18} fill="currentColor" /> Confirm Now
+                                </>
+                            )}
+                        </button>
+
+                        {(pickup || dropoff) && (
+                            <button
+                                onClick={() => { setPickup(null); setDropoff(null); }}
+                                className="flex items-center gap-2 px-6 py-4 bg-slate-50 text-slate-400 font-black uppercase text-[10px] hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all border border-slate-100"
+                            >
+                                <Trash2 size={16} /> Reset
+                            </button>
+                        )}
+
+                        {activeDataset?.additionalInfo && (
+                            <button
+                                onClick={() => setShowInfoModal(true)}
+                                className="flex items-center gap-2 px-6 py-4 bg-blue-50 text-blue-500 font-black uppercase text-[10px] hover:text-blue-600 hover:bg-blue-100 rounded-2xl transition-all border border-blue-100"
+                            >
+                                <Info size={16} /> Ticket Rules
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 
             {/* Layout Container with Fixed Height for scrolling */}
-            <div className="flex flex-col xl:flex-row gap-6 h-[750px]">
+            <div className="flex flex-col xl:flex-row gap-6 h-[750px] relative z-0">
                 {/* Left Panel: Search & Registry (Now occupies full sidebar width) */}
                 <div className="xl:w-1/4 bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden flex flex-col h-full">
                     <div className="p-6 border-b border-slate-100 bg-slate-50/20 flex-shrink-0">
@@ -327,6 +348,99 @@ export default function ExplorePage({
                     )}
                 </div>
             </div>
+
+            {/* Info Modal */}
+            {showInfoModal && activeDataset?.additionalInfo && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl animate-in zoom-in-95 duration-300 relative max-h-[85vh] overflow-hidden flex flex-col">
+                        <button
+                            onClick={() => setShowInfoModal(false)}
+                            className="absolute top-6 right-6 p-2 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors z-10"
+                        >
+                            <X size={20} className="text-slate-500" />
+                        </button>
+
+                        <div className="mb-6 shrink-0">
+                            <h3 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+                                <Car className="text-emerald-500" /> Service Details
+                            </h3>
+                            <p className="text-slate-500 text-sm font-bold mt-1">{activeDataset.additionalInfo.service_name}</p>
+                        </div>
+
+                        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar flex-1">
+                            {/* Usage Fee Section */}
+                            {activeDataset.additionalInfo.usage_fee && (
+                                <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                                    <h4 className="text-xs font-black uppercase text-emerald-500 tracking-widest mb-3 border-b border-slate-200/50 pb-2">
+                                        Flex Transport Fares
+                                    </h4>
+                                    <div className="space-y-4">
+                                        {Object.entries(activeDataset.additionalInfo.usage_fee).map(([category, value]) => (
+                                            <div key={category} className="space-y-1">
+                                                <p className="text-[10px] font-black uppercase text-slate-400">{formatKey(category)}</p>
+                                                {typeof value === 'object' && value !== null ? (
+                                                    Object.entries(value).map(([subKey, subValue]) => (
+                                                        <div key={subKey} className="flex justify-between items-start pl-2">
+                                                            <span className="text-sm font-bold text-slate-600">
+                                                                {typeof subKey === 'string' && subKey !== 'note' && isNaN(subKey) ? formatKey(subKey) : ''}
+                                                                {subKey === 'note' && <span className="text-amber-600 italic font-normal text-xs">{subValue}</span>}
+                                                            </span>
+                                                            {!Array.isArray(subValue) && typeof subValue !== 'object' && subKey !== 'note' && (
+                                                                <span className="font-black text-slate-900">
+                                                                    {typeof subValue === 'number' ? `¥ ${subValue}` : subValue}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <p className="text-sm text-slate-600">{value}</p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Important Notes */}
+                            {activeDataset.additionalInfo.important_notes && (
+                                <div className="bg-amber-50 p-5 rounded-2xl border border-amber-100">
+                                    <h4 className="text-xs font-black uppercase text-amber-600 tracking-widest mb-3 border-b border-amber-200/50 pb-2">
+                                        Important Notes
+                                    </h4>
+                                    <ul className="space-y-2">
+                                        {activeDataset.additionalInfo.important_notes.map((note, idx) => (
+                                            <li key={idx} className="text-xs font-bold text-amber-900 flex gap-2">
+                                                <span className="text-amber-500">•</span> {note}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {/* Reservation Methods */}
+                            {activeDataset.additionalInfo.reservation_methods && (
+                                <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                                    <h4 className="text-xs font-black uppercase text-blue-500 tracking-widest mb-3 border-b border-blue-200/50 pb-2">
+                                        How to Book
+                                    </h4>
+                                    <div className="space-y-3">
+                                        {activeDataset.additionalInfo.reservation_methods.map((method, idx) => (
+                                            <div key={idx} className="text-sm text-slate-700">
+                                                <span className="font-black text-blue-900">{method.method}:</span> {method.note || method.availability}
+                                            </div>
+                                        ))}
+                                        {activeDataset.additionalInfo.reservation_window && (
+                                            <div className="pt-2 text-xs font-bold text-slate-500 italic border-t border-blue-200/50 mt-2">
+                                                Window: {activeDataset.additionalInfo.reservation_window}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

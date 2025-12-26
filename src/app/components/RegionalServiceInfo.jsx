@@ -58,7 +58,7 @@ export default function RegionalServiceInfo({ additionalInfo }) {
                                     {Object.entries(additionalInfo.usage_fee.standard_fare).map(([key, value]) => (
                                         <div key={key} className="flex justify-between items-center">
                                             <span className="text-[10px] text-slate-400 capitalize">{key.replace(/_/g, ' ')}</span>
-                                            <span className="text-xs font-black text-white">¥{value}</span>
+                                            <span className="text-xs font-black text-white">¥ {value}</span>
                                         </div>
                                     ))}
                                 </div>

@@ -248,6 +248,13 @@ function AppContent() {
     }, [activeDataset, selectedPoint, plannerTimeFilter]);
 
     // --- Effects ---
+    // Redirect to planner if active dataset changes while on confirmation page
+    useEffect(() => {
+        if (location.pathname === '/confirmation') {
+            navigate('/planner');
+        }
+    }, [activeDatasetIndex]);
+
     useEffect(() => {
         const loadInitialData = async () => {
             console.log("Starting initial data load...");
@@ -446,13 +453,14 @@ function AppContent() {
             activeDataset?.additionalInfo?.usage_fee?.standard_fare?.general_adult ||
             500;
 
-        const totalFare = trainFare + vanFare;
+        // Use ONLY van fare (ignore train cost per user request)
+        const displayFare = vanFare;
 
         legs.push({
             type: 'van', from: activeDataset.hubStation, to: planner.toStop.name,
             line: activeDataset.rules?.['r1']?.desc || 'Rural Sync Bus',
             dep: formatTime(current), arr: formatTime(addMins(current, 25)),
-            isMajor: true, desc: "On-Demand Last Mile", cost: totalFare, delay: delayMins
+            isMajor: true, desc: "On-Demand Last Mile", cost: displayFare, delay: delayMins
         });
 
         return legs;
