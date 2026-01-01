@@ -171,6 +171,8 @@ function AppContent() {
         const filteredUsage = {};
         const filteredFlows = {};
 
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
         activeDataset.demandData.forEach(d => {
             const dateStr = d.pickup_date;
             if (!dateStr) return;
@@ -185,6 +187,9 @@ function AppContent() {
             if (plannerTimeFilter === 'all') match = true;
             else if (plannerTimeFilter === 'weekday' && !isWeekend) match = true;
             else if (plannerTimeFilter === 'weekend' && isWeekend) match = true;
+            else if (dayNames.includes(plannerTimeFilter)) {
+                if (dayNames[dayOfWeek] === plannerTimeFilter) match = true;
+            }
             else if (plannerTimeFilter === 'day') {
                 const sampleDate = activeDataset.demandData[0]?.pickup_date;
                 if (dateStr === sampleDate) match = true;

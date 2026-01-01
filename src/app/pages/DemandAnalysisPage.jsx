@@ -32,7 +32,9 @@ export default function DemandAnalysisPage({
     plannerTimeFilter,
     setPlannerTimeFilter
 }) {
-    // New Insight: Network Topology Analysis
+    const [showEmptyEvents, setShowEmptyEvents] = React.useState(false);
+
+    // New Insight: Connectivity Pattern Analysis
     const networkStats = React.useMemo(() => {
         if (!activeDataset || !demandStats.usage) return { dominantStop: null, hubDependency: 0, networkType: 'Analyzing...' };
 
@@ -62,9 +64,9 @@ export default function DemandAnalysisPage({
 
         const ratio = totalFlowTrips > 0 ? hubTrips / totalFlowTrips : 0;
 
-        let type = 'Mixed Hybrid';
-        if (ratio > 0.6) type = 'Radial Feeder';
-        else if (ratio < 0.3) type = 'Distributed Mesh';
+        let type = 'Hybrid Zone';
+        if (ratio > 0.6) type = 'Hub-Spoke System';
+        else if (ratio < 0.3) type = 'Any-to-Any Service';
 
         // 3. Identify Ghost Stops (Zero Usage)
         const ghostStops = activeDataset.stops.filter(s => !demandStats.usage[s.id] && !demandStats.flows[s.id]);
@@ -110,7 +112,8 @@ export default function DemandAnalysisPage({
             ghostStops: ghostStops.slice(0, 5), // Top 5 candidates
             ghostCount: ghostStops.length,
             avgTripKm,
-            mobilityType: avgTripKm < 2.5 ? 'Micromobility' : 'Vehicle Transit'
+            mobilityType: avgTripKm < 2.5 ? 'Micromobility' : 'Vehicle Transit',
+            permanentBusReady: maxUsage > 15
         };
     }, [activeDataset, demandStats]);
 
@@ -138,6 +141,38 @@ export default function DemandAnalysisPage({
                             />
                         </div>
                     </div>
+
+                    {/* NEW: Global Analysis Filters */}
+                    <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 space-y-4">
+                        <div>
+                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-2">Temporal Filter</p>
+                            <div className="flex flex-wrap gap-2">
+                                {['all', 'weekday', 'weekend', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                                    <button
+                                        key={day}
+                                        onClick={() => setPlannerTimeFilter(day)}
+                                        className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${plannerTimeFilter === day ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' : 'bg-white text-slate-400 hover:text-emerald-500 border border-slate-100'}`}
+                                    >
+                                        {{
+                                            'all': 'All', 'weekday': 'Weekday', 'weekend': 'Weekend',
+                                            'Monday': 'Mon', 'Tuesday': 'Tue', 'Wednesday': 'Wed',
+                                            'Thursday': 'Thu', 'Friday': 'Fri', 'Saturday': 'Sat', 'Sunday': 'Sun'
+                                        }[day]}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Map Layers</p>
+                            <button
+                                onClick={() => setShowEmptyEvents(!showEmptyEvents)}
+                                className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors ${showEmptyEvents ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}
+                            >
+                                {showEmptyEvents ? 'Hide Inactive Zones' : 'Show Inactive Zones'}
+                            </button>
+                        </div>
+                    </div>
+
                     <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
                         {activeDataset?.stops.map(stop => (
                             <button
@@ -194,17 +229,17 @@ export default function DemandAnalysisPage({
 
                                     return (
                                         <React.Fragment key={stop.id}>
-                                            {(usageCount > 0 || Object.keys(stopFlows).length > 0) && (
+                                            {(showEmptyEvents || usageCount > 0 || Object.keys(stopFlows).length > 0) && (
                                                 <>
                                                     {flowLines}
                                                     <CircleMarker
                                                         center={[stop.lat, stop.lon]}
-                                                        radius={radius}
-                                                        fillColor={color}
+                                                        radius={usageCount > 0 ? radius : 3}
+                                                        fillColor={usageCount > 0 ? color : '#cbd5e1'}
                                                         color="white"
                                                         weight={2}
-                                                        opacity={1}
-                                                        fillOpacity={0.6}
+                                                        opacity={usageCount > 0 ? 1 : 0.5}
+                                                        fillOpacity={usageCount > 0 ? 0.6 : 0.3}
                                                         eventHandlers={{
                                                             click: () => setSelectedPoint(stop),
                                                         }}
@@ -212,8 +247,14 @@ export default function DemandAnalysisPage({
                                                         <Popup>
                                                             <div className="p-1">
                                                                 <p className="font-black text-slate-900 m-0">{stop.name}</p>
-                                                                <p className="text-[10px] font-bold text-slate-500 m-0 uppercase mt-1">Total Usage: <span className="text-emerald-600">{usageCount} events</span></p>
-                                                                <p className="text-[9px] font-bold text-slate-400 m-0 uppercase mt-1">Destinations: {Object.keys(stopFlows).length}</p>
+                                                                {usageCount > 0 ? (
+                                                                    <>
+                                                                        <p className="text-[10px] font-bold text-slate-500 m-0 uppercase mt-1">Total Usage: <span className="text-emerald-600">{usageCount} events</span></p>
+                                                                        <p className="text-[9px] font-bold text-slate-400 m-0 uppercase mt-1">Destinations: {Object.keys(stopFlows).length}</p>
+                                                                    </>
+                                                                ) : (
+                                                                    <p className="text-[10px] font-bold text-slate-400 m-0 uppercase mt-1 italic">No recorded demand</p>
+                                                                )}
                                                             </div>
                                                         </Popup>
                                                     </CircleMarker>
@@ -249,21 +290,20 @@ export default function DemandAnalysisPage({
                 <div className="mt-8 bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden relative">
                     <div className="flex flex-col lg:flex-row gap-8 items-start">
                         <div className="flex-1 w-full">
-                            <div className="flex justify-between items-center mb-4">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                                 <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Demand Analysis: {selectedPoint.name}</p>
-                                <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
-                                    {[
-                                        { id: 'all', label: 'Month' },
-                                        { id: 'weekday', label: 'Wkday' },
-                                        { id: 'weekend', label: 'Wkend' },
-                                        { id: 'day', label: 'Peak' }
-                                    ].map(f => (
+                                <div className="flex flex-wrap gap-1">
+                                    {['all', 'weekday', 'weekend', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
                                         <button
-                                            key={f.id}
-                                            onClick={() => setPlannerTimeFilter(f.id)}
-                                            className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all ${plannerTimeFilter === f.id ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                            key={day}
+                                            onClick={() => setPlannerTimeFilter(day)}
+                                            className={`px-2 py-1 rounded text-[8px] font-black uppercase transition-all ${plannerTimeFilter === day ? 'bg-emerald-500 text-white shadow-sm' : 'bg-slate-50 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50'}`}
                                         >
-                                            {f.label}
+                                            {{
+                                                'all': 'All', 'weekday': 'WkDay', 'weekend': 'WkEnd',
+                                                'Monday': 'Mon', 'Tuesday': 'Tue', 'Wednesday': 'Wed',
+                                                'Thursday': 'Thu', 'Friday': 'Fri', 'Saturday': 'Sat', 'Sunday': 'Sun'
+                                            }[day]}
                                         </button>
                                     ))}
                                 </div>
@@ -292,7 +332,7 @@ export default function DemandAnalysisPage({
                                 </div>
                                 <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 shadow-sm shadow-emerald-500/10 col-span-2 md:col-span-4 lg:col-span-1">
                                     <p className="text-xs font-black text-emerald-700 uppercase flex items-center gap-1 tracking-wide">
-                                        <TrendingUp size={12} /> Usage Logic
+                                        <TrendingUp size={12} /> Priority Level
                                     </p>
                                     <p className="text-xl font-black text-emerald-800 leading-tight mt-2">
                                         {demandStats.usage[selectedPoint.id] > 20 ? 'Actionable Priority' : 'Routine Monitoring'}
@@ -307,7 +347,7 @@ export default function DemandAnalysisPage({
                                     <Activity size={64} fill="white" />
                                 </div>
                                 <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-4 flex items-center gap-2 relative z-10">
-                                    <Activity size={12} fill="currentColor" /> Network Topology
+                                    <Activity size={12} fill="currentColor" /> Connectivity Pattern
                                 </p>
 
                                 <div className="space-y-4 relative z-10">
@@ -316,35 +356,32 @@ export default function DemandAnalysisPage({
                                         <p className="font-black text-lg leading-tight truncate">{networkStats.dominantStop?.name || 'N/A'}</p>
                                     </div>
 
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex-1">
-                                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Structure</p>
-                                            <div className="px-3 py-1.5 bg-white/10 rounded-xl border border-white/10 inline-block">
-                                                <span className={`text-xs font-black ${networkStats.hubDependency > 0.6 ? 'text-amber-400' : 'text-blue-400'}`}>
-                                                    {networkStats.networkType}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Hub Dependency</p>
-                                            <p className="font-black text-2xl">{(networkStats.hubDependency * 100).toFixed(0)}<span className="text-xs text-slate-500">%</span></p>
-                                        </div>
-                                    </div>
-
                                     <div className="pt-4 border-t border-white/10">
-                                        <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-2">Planner Strategy</p>
+                                        <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-2">Strategic Recommendation</p>
                                         <p className="text-xs font-bold leading-relaxed text-slate-300">
                                             {networkStats.hubDependency > 0.6
-                                                ? "High hub dependency suggests a 'Spoke-and-Hub' optimization. Prioritize scheduling sync at the dominant hub over point-to-point flexibility."
-                                                : "Distributed usage indicates a true 'Mobility Mesh'. Maintain flexible routing logic and consider multiple smaller waiting zones."}
+                                                ? "Relies heavily on central nodes. Prioritize scheduling sync at the dominant hub."
+                                                : "Distributed usage indicates a mesh pattern. Maintain flexible routing."}
                                         </p>
+                                        {/* Permanent Bus Suggestion based on filter */}
+                                        {networkStats.permanentBusReady && (
+                                            <div className="mt-3 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                                                <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+                                                    <Zap size={10} /> Fixed Route Opportunity
+                                                </p>
+                                                <p className="text-[10px] font-bold text-emerald-100 leading-tight">
+                                                    High persistent volume {(plannerTimeFilter !== 'all') && `on ${plannerTimeFilter}s`} detected at {networkStats.dominantStop?.name}.
+                                                    Consider transitioning to a permanent fixed-route bus service to reduce on-demand operational costs.
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Optimization Candidates (Ghost Stops) */}
-                                    {networkStats.ghostCount > 0 && (
+                                    {networkStats.ghostCount > 0 && plannerTimeFilter === 'all' && (
                                         <div className="pt-4 border-t border-white/10">
                                             <p className="text-[9px] font-bold text-rose-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                                                <TrendingUp size={10} className="rotate-180" /> Optimization Candidates ({networkStats.ghostCount})
+                                                <TrendingUp size={10} className="rotate-180" /> Underutilized Infrastructure ({networkStats.ghostCount})
                                             </p>
                                             <div className="flex flex-wrap gap-2">
                                                 {networkStats.ghostStops.map(s => (
