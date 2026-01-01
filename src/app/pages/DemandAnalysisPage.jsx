@@ -32,6 +32,88 @@ export default function DemandAnalysisPage({
     plannerTimeFilter,
     setPlannerTimeFilter
 }) {
+    // New Insight: Network Topology Analysis
+    const networkStats = React.useMemo(() => {
+        if (!activeDataset || !demandStats.usage) return { dominantStop: null, hubDependency: 0, networkType: 'Analyzing...' };
+
+        // 1. Find Dominant Hub
+        let maxUsage = 0;
+        let dominantId = null;
+        Object.entries(demandStats.usage).forEach(([id, count]) => {
+            if (count > maxUsage) {
+                maxUsage = count;
+                dominantId = id;
+            }
+        });
+        const dominantStop = activeDataset.stops.find(s => s.id === dominantId);
+
+        // 2. Calculate Hub Dependency (Flows touching hub / Total flows)
+        let hubTrips = 0;
+        let totalFlowTrips = 0;
+
+        Object.entries(demandStats.flows || {}).forEach(([originId, dests]) => {
+            Object.entries(dests).forEach(([destId, count]) => {
+                totalFlowTrips += count;
+                if (originId === dominantId || destId === dominantId) {
+                    hubTrips += count;
+                }
+            });
+        });
+
+        const ratio = totalFlowTrips > 0 ? hubTrips / totalFlowTrips : 0;
+
+        let type = 'Mixed Hybrid';
+        if (ratio > 0.6) type = 'Radial Feeder';
+        else if (ratio < 0.3) type = 'Distributed Mesh';
+
+        // 3. Identify Ghost Stops (Zero Usage)
+        const ghostStops = activeDataset.stops.filter(s => !demandStats.usage[s.id] && !demandStats.flows[s.id]);
+
+        // 4. Calculate Mean Trip Distance (approx KM)
+        let totalDistKm = 0;
+        let distTrips = 0;
+
+        // Simple Haversine-like approximation for local distances
+        const deg2rad = (deg) => deg * (Math.PI / 180);
+        const getDistKm = (lat1, lon1, lat2, lon2) => {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        };
+
+        Object.entries(demandStats.flows || {}).forEach(([originId, dests]) => {
+            const origin = activeDataset.stops.find(s => s.id === originId);
+            if (!origin) return;
+
+            Object.entries(dests).forEach(([destId, count]) => {
+                const dest = activeDataset.stops.find(s => s.id === destId);
+                if (dest) {
+                    const dist = getDistKm(origin.lat, origin.lon, dest.lat, dest.lon);
+                    totalDistKm += (dist * count);
+                    distTrips += count;
+                }
+            });
+        });
+
+        const avgTripKm = distTrips > 0 ? (totalDistKm / distTrips) : 0;
+
+        return {
+            dominantStop,
+            hubDependency: ratio,
+            networkType: type,
+            ghostStops: ghostStops.slice(0, 5), // Top 5 candidates
+            ghostCount: ghostStops.length,
+            avgTripKm,
+            mobilityType: avgTripKm < 2.5 ? 'Micromobility' : 'Vehicle Transit'
+        };
+    }, [activeDataset, demandStats]);
+
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <header className="mb-12">
@@ -188,72 +270,124 @@ export default function DemandAnalysisPage({
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase">Filtered Events</p>
-                                    <p className="text-2xl font-black text-slate-900">{demandStats.usage[selectedPoint.id] || 0}</p>
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Filtered Events</p>
+                                    <p className="text-3xl font-black text-slate-900 mt-1">{demandStats.usage[selectedPoint.id] || 0}</p>
                                 </div>
                                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase">Peak Hourly Demand</p>
-                                    <p className="text-2xl font-black text-slate-900">{pointStats.maxUsage}</p>
-                                    <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">at {pointStats.peakHour}:00</p>
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Peak Hourly Demand</p>
+                                    <p className="text-3xl font-black text-slate-900 mt-1">{pointStats.maxUsage}</p>
+                                    <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">at {pointStats.peakHour}:00</p>
                                 </div>
                                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase">Service Window</p>
-                                    <p className="text-2xl font-black text-slate-900">{selectedPoint.window}</p>
-                                    <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">GTFS-Flex Sync</p>
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Service Window</p>
+                                    <p className="text-3xl font-black text-slate-900 mt-1">{selectedPoint.window}</p>
+                                    <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">GTFS-Flex Sync</p>
                                 </div>
-                                <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 shadow-sm shadow-emerald-500/10">
-                                    <p className="text-[10px] font-black text-emerald-600 uppercase flex items-center gap-1">
-                                        <TrendingUp size={10} /> Usage Logic
+                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Avg Trip Dist</p>
+                                    <p className="text-3xl font-black text-slate-900 mt-1">{networkStats.avgTripKm.toFixed(1)} <span className="text-sm text-slate-500 font-bold">km</span></p>
+                                    <p className={`text-[10px] font-bold uppercase mt-1 ${networkStats.avgTripKm < 2.5 ? 'text-blue-600' : 'text-slate-500'}`}>
+                                        {networkStats.mobilityType}
                                     </p>
-                                    <p className="text-lg font-black text-emerald-700 leading-tight mt-1">
-                                        {demandStats.usage[selectedPoint.id] > 20 ? 'Actionable' : 'Monitoring'}
+                                </div>
+                                <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 shadow-sm shadow-emerald-500/10 col-span-2 md:col-span-4 lg:col-span-1">
+                                    <p className="text-xs font-black text-emerald-700 uppercase flex items-center gap-1 tracking-wide">
+                                        <TrendingUp size={12} /> Usage Logic
+                                    </p>
+                                    <p className="text-xl font-black text-emerald-800 leading-tight mt-2">
+                                        {demandStats.usage[selectedPoint.id] > 20 ? 'Actionable Priority' : 'Routine Monitoring'}
                                     </p>
                                 </div>
                             </div>
                         </div>
-                        <div className="lg:w-1/3 w-full bg-slate-900 text-white p-6 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-4 opacity-10">
-                                <Zap size={64} fill="white" />
-                            </div>
-                            <p className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-3 flex items-center gap-2 relative z-10">
-                                <Zap size={12} fill="currentColor" /> Strategic Recommendation
-                            </p>
-                            <p className="text-sm font-bold leading-relaxed relative z-10">{pointStats.recommendation}</p>
-                            <div className="mt-4 flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-tighter relative z-10">
-                                <span>{plannerTimeFilter} view</span>
-                                <div className="w-1 h-1 rounded-full bg-slate-700"></div>
-                                <span>Threshold: 20</span>
+                        <div className="lg:w-1/3 w-full flex flex-col gap-4">
+                            {/* Network Topology Card (New Insight) */}
+                            <div className="bg-slate-900 text-white p-6 rounded-3xl border border-white/5 shadow-xl relative overflow-hidden flex-1">
+                                <div className="absolute top-0 right-0 p-4 opacity-10">
+                                    <Activity size={64} fill="white" />
+                                </div>
+                                <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-4 flex items-center gap-2 relative z-10">
+                                    <Activity size={12} fill="currentColor" /> Network Topology
+                                </p>
+
+                                <div className="space-y-4 relative z-10">
+                                    <div>
+                                        <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Dominant Hub</p>
+                                        <p className="font-black text-lg leading-tight truncate">{networkStats.dominantStop?.name || 'N/A'}</p>
+                                    </div>
+
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex-1">
+                                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Structure</p>
+                                            <div className="px-3 py-1.5 bg-white/10 rounded-xl border border-white/10 inline-block">
+                                                <span className={`text-xs font-black ${networkStats.hubDependency > 0.6 ? 'text-amber-400' : 'text-blue-400'}`}>
+                                                    {networkStats.networkType}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Hub Dependency</p>
+                                            <p className="font-black text-2xl">{(networkStats.hubDependency * 100).toFixed(0)}<span className="text-xs text-slate-500">%</span></p>
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-4 border-t border-white/10">
+                                        <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-2">Planner Strategy</p>
+                                        <p className="text-xs font-bold leading-relaxed text-slate-300">
+                                            {networkStats.hubDependency > 0.6
+                                                ? "High hub dependency suggests a 'Spoke-and-Hub' optimization. Prioritize scheduling sync at the dominant hub over point-to-point flexibility."
+                                                : "Distributed usage indicates a true 'Mobility Mesh'. Maintain flexible routing logic and consider multiple smaller waiting zones."}
+                                        </p>
+                                    </div>
+
+                                    {/* Optimization Candidates (Ghost Stops) */}
+                                    {networkStats.ghostCount > 0 && (
+                                        <div className="pt-4 border-t border-white/10">
+                                            <p className="text-[9px] font-bold text-rose-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                                <TrendingUp size={10} className="rotate-180" /> Optimization Candidates ({networkStats.ghostCount})
+                                            </p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {networkStats.ghostStops.map(s => (
+                                                    <span key={s.id} className="px-2 py-1 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-md text-[9px] font-bold truncate max-w-[120px]">
+                                                        {s.name}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <p className="text-[8px] text-slate-500 mt-1 italic">Stops with zero recorded demand. Consider relocating.</p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div className="mt-8">
-                        <div className="flex items-center justify-between mb-2">
-                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Active Service Hours Distribution ({selectedPoint.window})</p>
-                            <div className="flex gap-2">
-                                <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div> <span className="text-[8px] font-bold text-slate-500 uppercase">Peak</span></div>
-                                <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-slate-200"></div> <span className="text-[8px] font-bold text-slate-500 uppercase">Standard</span></div>
+                        <div className="flex items-center justify-between mb-3">
+                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Active Service Hours Distribution ({selectedPoint.window})</p>
+                            <div className="flex gap-3">
+                                <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-400"></div> <span className="text-[9px] font-bold text-slate-600 uppercase">Peak</span></div>
+                                <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-slate-200"></div> <span className="text-[9px] font-bold text-slate-500 uppercase">Standard</span></div>
                             </div>
                         </div>
-                        <div className="flex items-end gap-1.5 h-16 w-full">
+                        <div className="flex items-end gap-1.5 h-20 w-full mt-2">
                             {pointStats.serviceHours.map((val, idx) => {
                                 const h = pointStats.startHour + idx;
                                 return (
                                     <div
                                         key={h}
-                                        className={`flex-1 rounded-t-md transition-all duration-500 group relative ${h === pointStats.peakHour ? 'bg-amber-400' : 'bg-slate-100 hover:bg-slate-200'}`}
-                                        style={{ height: `${Math.max((val / (pointStats.maxUsage || 1)) * 100, 4)}%` }}
+                                        className={`flex-1 rounded-t-lg transition-all duration-500 group relative ${h === pointStats.peakHour ? 'bg-amber-400 shadow-md' : 'bg-slate-100 hover:bg-slate-200'}`}
+                                        style={{ height: `${Math.max((val / (pointStats.maxUsage || 1)) * 100, 8)}%` }}
                                     >
-                                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-xl">
-                                            {h}:00: {val} events
+                                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-xl">
+                                            {h}:00 — {val} events
                                         </div>
                                     </div>
                                 );
                             })}
                         </div>
-                        <div className="flex justify-between text-[8px] font-black text-slate-400 uppercase mt-2 border-t border-slate-50 pt-2">
+                        <div className="flex justify-between text-[9px] font-bold text-slate-500 uppercase mt-2 border-t border-slate-100 pt-2">
                             <span>{pointStats.startHour}:00</span>
-                            <span>Midpoint</span>
+                            <span className="text-slate-400">Midpoint</span>
                             <span>{pointStats.endHour}:00</span>
                         </div>
                     </div>

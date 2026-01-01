@@ -190,35 +190,55 @@ export default function PlannerPage({
                                     <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <p className="text-slate-400 text-[8px] font-black uppercase tracking-widest mb-1 flex items-center gap-1">
-                                                    <Clock size={8} /> Operating Hours
+                                                <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2 flex items-center gap-1">
+                                                    <Clock size={10} /> Operating Hours
                                                 </p>
-                                                <p className="font-bold text-slate-800 text-sm leading-tight">
+                                                <p className="font-bold text-slate-900 text-sm leading-tight">
                                                     {activeDataset.additionalInfo.operating_hours || '08:00 - 18:00'}
                                                 </p>
                                             </div>
                                             <div>
-                                                <p className="text-slate-400 text-[8px] font-black uppercase tracking-widest mb-1 flex items-center gap-1">
-                                                    <Phone size={8} /> Reservations
+                                                <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2 flex items-center gap-1">
+                                                    <Phone size={10} /> Reservations
                                                 </p>
-                                                <p className="font-bold text-slate-800 text-sm leading-tight">
-                                                    {activeDataset.additionalInfo.telephone_number_for_reservation || 'Check Website'}
-                                                </p>
+                                                <div className="space-y-1.5">
+                                                    {activeDataset.additionalInfo.reservation_methods ? (
+                                                        activeDataset.additionalInfo.reservation_methods.map((method, idx) => (
+                                                            <div key={idx} className="text-xs font-bold text-slate-800 leading-tight">
+                                                                <span className="block text-[10px] text-slate-500 uppercase font-black">{method.method}</span>
+                                                                <div className="flex flex-col sm:flex-row sm:items-center gap-1 mt-0.5">
+                                                                    {method.allowed_to?.toLowerCase().includes('resident') && (
+                                                                        <span className="self-start sm:self-auto text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded text-[10px] border border-amber-100 whitespace-nowrap">Residents Only</span>
+                                                                    )}
+                                                                    {(method.method === 'Telephone' || method.method.includes('Phone')) ? (
+                                                                        <span>{activeDataset.additionalInfo.telephone_number_for_reservation || method.availability}</span>
+                                                                    ) : (
+                                                                        <span>{method.availability?.includes('24') ? '24/7 Available' : 'Available'}</span>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <p className="font-bold text-slate-800 text-sm leading-tight">
+                                                            {activeDataset.additionalInfo.telephone_number_for_reservation || 'Check Website'}
+                                                        </p>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                         {activeDataset.additionalInfo.reservation_window && (
-                                            <div className="mt-4 pt-4 border-t border-slate-200/50">
-                                                <p className="text-slate-400 text-[8px] font-black uppercase tracking-widest mb-1 flex items-center gap-1">
-                                                    <Clock size={8} /> Reservation Window
+                                            <div className="mt-4 pt-3 pb-3 px-4 bg-amber-50 rounded-xl border border-amber-200/60 shadow-sm">
+                                                <p className="text-amber-800/60 text-[10px] font-black uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                                                    <Clock size={10} /> Reservation Window
                                                 </p>
-                                                <p className="font-bold text-slate-800 text-sm leading-tight">
+                                                <p className="font-black text-amber-900 text-sm leading-snug">
                                                     {activeDataset.additionalInfo.reservation_window}
                                                 </p>
                                             </div>
                                         )}
                                         <div className="mt-4 pt-4 border-t border-slate-200/50">
-                                            <p className="text-slate-400 text-[8px] font-black uppercase tracking-widest mb-1 flex items-center gap-1">
-                                                <MapPin size={8} /> Service Area
+                                            <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2 flex items-center gap-1">
+                                                <MapPin size={10} /> Service Area
                                             </p>
                                             <p className="font-bold text-slate-800 text-sm leading-tight">
                                                 {activeDataset.additionalInfo.service_name || activeDataset.name}

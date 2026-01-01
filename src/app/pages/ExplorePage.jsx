@@ -118,6 +118,8 @@ export default function ExplorePage({
             type: 'explore',
             from: pickup.name,
             to: dropoff.name,
+            fromCoords: `${pickup.lat},${pickup.lon}`,
+            toCoords: `${dropoff.lat},${dropoff.lon}`,
             date: new Date().toISOString().split('T')[0],
             departureTime: formatTime(new Date()),
             arrivalTime: formatTime(addMins(new Date(), 25)),

@@ -41,7 +41,7 @@
             "note": "Call the Norassa Reservation Center. Busy hours are typically in the morning."
         }
     ],
-    "reservation_window": "From 1 week in advance until 30 minutes before the scheduled ride",
+    "   ": "From 1 week in advance until 30 minutes before the scheduled ride",
     "additional_info_page": "https://www.city.hirakawa.lg.jp/kurashi/koutsu/norassa.html",
     "important_notes": [
         "If you are not at the stop at the reserved time, the vehicle will depart to the next destination.",

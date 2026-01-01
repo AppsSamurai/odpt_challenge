@@ -10,7 +10,9 @@ import {
     Train,
     Bus,
     X,
-    AlertCircle
+    AlertCircle,
+    Map,
+    ExternalLink
 } from 'lucide-react';
 import { addMins, formatTime } from '../utils';
 
@@ -67,7 +69,7 @@ export default function BookingConfirmationPage({
 
     if (!bookingDetails) return null;
 
-    const { type, from, to, provider, noticePeriod, cost, usageFee, operatingHours } = bookingDetails;
+    const { type, from, to, provider, noticePeriod, cost, usageFee, operatingHours, fromCoords, toCoords } = bookingDetails;
 
     // Parse Operating Hours safely
     const [opStart, opEnd] = (operatingHours || "00:00 - 23:59").split('-').map(s => s.trim());
@@ -145,7 +147,7 @@ export default function BookingConfirmationPage({
                         Action Required
                     </p>
                     <p className="text-amber-900 text-sm font-bold leading-relaxed">
-                        Strict Notice Policy: You must book at least <span className="bg-amber-500 text-white px-1.5 py-0.5 rounded text-xs font-black mx-1 inline-block transform -skew-x-6">{noticePeriod || '30'} MINS</span> before departure.
+                        Strict Notice Policy: You must book at least <span className="bg-amber-500 text-white px-1.5 py-0.5 rounded text-xs font-black mx-1 inline-block transform -skew-x-6">30 MINS</span> before departure.
                     </p>
                 </div>
             </div>
@@ -186,6 +188,14 @@ export default function BookingConfirmationPage({
                                                 <p className="text-slate-500 text-[10px] font-black uppercase tracking-tighter mb-1">Destination</p>
                                                 <p className="font-black text-lg leading-tight">{to}</p>
                                             </div>
+                                            <a
+                                                href={`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(fromCoords || from)}&destination=${encodeURIComponent(toCoords || to)}&travelmode=transit`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 pt-2 text-[10px] font-bold text-emerald-400 hover:text-emerald-300 transition-colors uppercase tracking-wider group border-t border-slate-700/50 w-full"
+                                            >
+                                                <Map size={14} /> Compare with Public Transit <ExternalLink size={10} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -337,7 +347,7 @@ export default function BookingConfirmationPage({
                     {!isConfirmed && (
                         <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-200">
                             <p className="text-slate-400 font-bold text-xs leading-relaxed italic">
-                                "Please ensure you are at the pickup location {noticePeriod || '30'} minutes before the scheduled time to sync with regional operations."
+                                "Please ensure you are at the pickup location 30 minutes before the scheduled time to sync with regional operations."
                             </p>
                         </div>
                     )}
