@@ -41,10 +41,10 @@ export default function PlannerPage({
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
             <header className="mb-12">
                 <h2 className="text-4xl font-black text-slate-900 tracking-tight flex items-center gap-4">
-                    Tokyo ➔ Region Planner
+                    Trip Planner
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase border border-emerald-100 shadow-sm animate-in fade-in duration-700">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Live Rail Tracking
+                        Live ODPT Rail Tracking
                     </span>
                 </h2>
                 <p className="text-slate-500 font-bold mt-1">

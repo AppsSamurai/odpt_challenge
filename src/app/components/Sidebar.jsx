@@ -84,7 +84,7 @@ export default function Sidebar({
                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 px-4">Regional Dataset</p>
                 <label className="flex items-center gap-3 p-4 rounded-2xl border-2 border-dashed border-slate-700 hover:border-emerald-500 cursor-pointer transition bg-slate-800/30 mb-4 mx-2">
                     <Plus size={18} />
-                    <span className="text-xs font-bold">Import GTFS</span>
+                    <span className="text-xs font-bold">Import GTFS-Flex Data</span>
                     <input type="file" className="hidden" multiple onChange={handleFileUpload} />
                 </label>
 
