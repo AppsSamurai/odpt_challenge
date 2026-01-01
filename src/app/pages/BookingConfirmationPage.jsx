@@ -330,10 +330,7 @@ export default function BookingConfirmationPage({
                                 <p className="text-slate-400 text-[8px] font-black uppercase tracking-widest mb-1">Reservation ID</p>
                                 <p className="font-black text-slate-900 leading-tight">RES-{Math.random().toString(36).substring(7).toUpperCase()}</p>
                             </div>
-                            <div className="p-4 bg-slate-50 rounded-2xl">
-                                <p className="text-slate-400 text-[8px] font-black uppercase tracking-widest mb-1">Sync Protocol</p>
-                                <p className="font-black text-slate-900 leading-tight">GTFS-Flex Integration v2.4</p>
-                            </div>
+
                             <div className="p-4 bg-slate-50 rounded-2xl">
                                 <p className="text-slate-400 text-[8px] font-black uppercase tracking-widest mb-1">Hub Status</p>
                                 <div className="flex items-center gap-2 mt-1">
