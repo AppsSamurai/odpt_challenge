@@ -4,6 +4,7 @@ import JSZip from 'jszip';
 
 // Utils & Constants
 import { API_KEY, ODPT_URL, INITIAL_HUBS, HUB_MAPPING, parseCSV, addMins, formatTime } from './app/utils';
+import { getTranslation } from './app/translations';
 
 // Components
 import Sidebar from './app/components/Sidebar';
@@ -22,6 +23,8 @@ function AppContent() {
     const navigate = useNavigate();
     const view = location.pathname.split('/')[1] || 'planner';
     const setView = (v) => navigate(`/${v}`);
+    const [language, setLanguage] = useState('jp');
+    const t = (key) => getTranslation(language, key);
 
     // --- State Management ---
     const [loading, setLoading] = useState(false);
@@ -480,9 +483,22 @@ function AppContent() {
                 setPlanner={setPlanner} setSelectedPoint={setSelectedPoint}
                 plannerTimeFilter={plannerTimeFilter} setPlannerTimeFilter={setPlannerTimeFilter}
                 demandStats={demandStats} handleFileUpload={handleFileUpload}
+                language={language} t={t}
             />
 
-            <main className="lg:ml-72 p-8 lg:p-12 min-h-screen">
+            <main className="lg:ml-72 p-8 lg:p-12 min-h-screen relative">
+                {/* Language Switcher */}
+                <div className="absolute top-6 right-8 z-50">
+                    <select
+                        value={language}
+                        onChange={(e) => setLanguage(e.target.value)}
+                        className="bg-white/90 backdrop-blur-sm border border-slate-200 text-xs font-bold rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+                    >
+                        <option value="jp">🇯🇵 日本語</option>
+                        <option value="en">🇺🇸 English</option>
+                    </select>
+                </div>
+
                 <Routes>
                     <Route path="/planner" element={
                         <PlannerPage
@@ -493,6 +509,7 @@ function AppContent() {
                                 setBookingDetails(details);
                                 navigate('/confirmation');
                             }}
+                            language={language} t={t}
                         />
                     } />
                     <Route path="/explore" element={
@@ -503,6 +520,7 @@ function AppContent() {
                                 setBookingDetails(details);
                                 navigate('/confirmation');
                             }}
+                            language={language} t={t}
                         />
                     } />
                     <Route path="/insights" element={
@@ -511,12 +529,14 @@ function AppContent() {
                             selectedPoint={selectedPoint} setSelectedPoint={setSelectedPoint}
                             demandStats={demandStats} pointStats={pointStats}
                             plannerTimeFilter={plannerTimeFilter} setPlannerTimeFilter={setPlannerTimeFilter}
+                            language={language} t={t}
                         />
                     } />
                     <Route path="/confirmation" element={
                         <BookingConfirmationPage
                             bookingDetails={bookingDetails}
                             onBack={() => navigate(-1)}
+                            language={language} t={t}
                         />
                     } />
                     <Route path="*" element={<Navigate to="/planner" replace />} />

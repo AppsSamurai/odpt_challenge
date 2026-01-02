@@ -26,7 +26,8 @@ export default function Sidebar({
     plannerTimeFilter,
     setPlannerTimeFilter,
     demandStats,
-    handleFileUpload
+    handleFileUpload,
+    t
 }) {
     return (
         <aside className="bg-slate-900 text-slate-300 w-72 fixed h-full hidden lg:flex flex-col p-6 z-20 overflow-y-auto custom-scrollbar">
@@ -42,27 +43,27 @@ export default function Sidebar({
                     onClick={() => setView('planner')}
                     className={`w-full flex items-center gap-3 p-4 rounded-2xl font-bold transition-all ${view === 'planner' ? 'bg-white/10 text-white' : 'hover:bg-white/5'}`}
                 >
-                    <Search size={18} /> Trip Planner
+                    <Search size={18} /> {t('Trip Planner')}
                 </button>
                 <button
                     onClick={() => setView('explore')}
                     className={`w-full flex items-center gap-3 p-4 rounded-2xl font-bold transition-all ${view === 'explore' ? 'bg-white/10 text-white' : 'hover:bg-white/5'}`}
                 >
-                    <MapIcon size={18} /> Explore Regional Hubs
+                    <MapIcon size={18} /> {t('Explore Regional Hubs')}
                 </button>
                 <div className="pt-2 pb-1 px-4">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Analytics</p>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('Analytics')}</p>
                 </div>
                 <button
                     onClick={() => setView('insights')}
                     className={`w-full flex items-center gap-3 p-4 rounded-2xl font-bold transition-all ${view === 'insights' ? 'bg-white/10 text-white' : 'hover:bg-white/5'}`}
                 >
-                    <BarChart3 size={18} className="text-amber-400" /> City Planner
+                    <BarChart3 size={18} className="text-amber-400" /> {t('City Planner')}
                 </button>
             </nav>
 
             <div className="mb-8 px-2 shrink-0">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 px-2">Live Rail Tracker</p>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 px-2">{t('Live Rail Tracker')}</p>
                 <div className="bg-slate-800/40 rounded-2xl border border-white/5 p-4">
                     <div className="flex justify-between items-center mb-3">
                         <span className="text-[10px] font-bold text-slate-400">{planner.from?.lines[0] || 'Mainline Rail'}</span>
@@ -73,18 +74,18 @@ export default function Sidebar({
                     </div>
                     <div className="flex items-baseline gap-2">
                         <span className={`text-2xl font-black ${liveRouteData.delay > 0 ? 'text-amber-400' : 'text-white'}`}>
-                            {liveRouteData.delay > 0 ? `+${liveRouteData.delay}m` : 'On Time'}
+                            {liveRouteData.delay > 0 ? `+${liveRouteData.delay}m` : t('On Time')}
                         </span>
-                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Current Delay</span>
+                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">{t('Current Delay')}</span>
                     </div>
                 </div>
             </div>
 
             <div className="mb-8 shrink-0">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 px-4">Regional Dataset</p>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 px-4">{t('Regional Dataset')}</p>
                 <label className="flex items-center gap-3 p-4 rounded-2xl border-2 border-dashed border-slate-700 hover:border-emerald-500 cursor-pointer transition bg-slate-800/30 mb-4 mx-2">
                     <Plus size={18} />
-                    <span className="text-xs font-bold">Import GTFS-Flex Data</span>
+                    <span className="text-xs font-bold">{t('Import GTFS-Flex Data')}</span>
                     <input type="file" className="hidden" multiple onChange={handleFileUpload} />
                 </label>
 
@@ -121,13 +122,13 @@ export default function Sidebar({
             {view === 'insights' && activeDataset && (
                 <div className="mb-8 px-2 animate-in slide-in-from-bottom-4 duration-500 shrink-0">
                     <div className="mb-6 space-y-2">
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Analysis Window</p>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">{t('Analysis Window')}</p>
                         <div className="grid grid-cols-2 gap-1 px-1">
                             {[
-                                { id: 'all', label: 'Full Month' },
-                                { id: 'weekday', label: 'Weekdays' },
-                                { id: 'weekend', label: 'Weekends' },
-                                { id: 'day', label: 'Peak Day' }
+                                { id: 'all', label: t('Full Month') },
+                                { id: 'weekday', label: t('Weekdays') },
+                                { id: 'weekend', label: t('Weekends') },
+                                { id: 'day', label: t('Peak Day') }
                             ].map(f => (
                                 <button
                                     key={f.id}
@@ -140,7 +141,7 @@ export default function Sidebar({
                         </div>
                     </div>
                     <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-4 px-2 flex items-center gap-2">
-                        <TrendingUp size={12} /> Infrastructure Insights
+                        <TrendingUp size={12} /> {t('Infrastructure Insights')}
                     </p>
                     <div className="space-y-3">
                         {(() => {
@@ -196,10 +197,10 @@ export default function Sidebar({
 
             <div className="mt-auto pt-6 shrink-0">
                 <div className="p-4 bg-slate-800/50 rounded-2xl border border-slate-700">
-                    <p className="text-[10px] font-black text-emerald-400 uppercase mb-2">System Status</p>
+                    <p className="text-[10px] font-black text-emerald-400 uppercase mb-2">{t('System Status')}</p>
                     <div className="flex items-center gap-2 text-xs font-bold text-white">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                        ODPT Live Active
+                        {t('ODPT Live Active')}
                     </div>
                 </div>
             </div>

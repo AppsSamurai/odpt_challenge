@@ -54,7 +54,8 @@ export default function ExplorePage({
     activeDataset,
     selectedPoint,
     setSelectedPoint,
-    onBook
+    onBook,
+    t
 }) {
     const [pickup, setPickup] = useState(null);
     const [dropoff, setDropoff] = useState(null);
@@ -141,10 +142,10 @@ export default function ExplorePage({
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-[1600px] mx-auto">
             <header className="mb-8">
                 <h2 className="text-4xl font-black text-slate-900 tracking-tight flex items-center gap-4">
-                    Explore Regional Hubs
+                    {t('Explore Regional Hubs')}
                 </h2>
                 <p className="text-slate-500 font-bold mt-1">
-                    {activeDataset ? `Accessing ${activeDataset.stops?.length || 0} GTFS-Flex pickup points in ${activeDataset.additionalInfo?.service_name || activeDataset.name}` : 'Select a regional dataset to begin exploration.'}
+                    {activeDataset ? `${t('Accessing')} ${activeDataset.stops?.length || 0} ${t('pickup points in')} ${activeDataset.additionalInfo?.service_name || activeDataset.name}` : t('Select a regional dataset to begin exploration.')}
                 </p>
             </header>
 
@@ -153,12 +154,13 @@ export default function ExplorePage({
                 <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl p-8 space-y-6 animate-in slide-in-from-top-4 duration-500">
                     <div className="flex flex-col md:flex-row items-end gap-4 w-full">
                         <div className="flex-1 w-full translate-y-2">
+
                             <SearchableSelect
-                                label="Startup Point"
+                                label={t('Startup Point')}
                                 value={pickup}
                                 options={activeDataset?.stops || []}
                                 onChange={(val) => { setPickup(val); setSelectedPoint(val); }}
-                                placeholder="Select origin..."
+                                placeholder={t('Select origin...')}
                                 disabled={!activeDataset}
                             />
                         </div>
@@ -174,11 +176,11 @@ export default function ExplorePage({
 
                         <div className="flex-1 w-full translate-y-2">
                             <SearchableSelect
-                                label="Destination Point"
+                                label={t('Destination Point')}
                                 value={dropoff}
                                 options={activeDataset?.stops || []}
                                 onChange={(val) => { setDropoff(val); setSelectedPoint(val); }}
-                                placeholder="Select destination..."
+                                placeholder={t('Select destination...')}
                                 disabled={!activeDataset}
                             />
                         </div>
@@ -193,11 +195,11 @@ export default function ExplorePage({
                             {isRequesting ? (
                                 <>
                                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                    Syncing...
+                                    {t('Syncing...')}
                                 </>
                             ) : (
                                 <>
-                                    <Zap size={18} fill="currentColor" /> Confirm Now
+                                    <Zap size={18} fill="currentColor" /> {t('Confirm Now')}
                                 </>
                             )}
                         </button>
@@ -207,7 +209,7 @@ export default function ExplorePage({
                                 onClick={() => { setPickup(null); setDropoff(null); }}
                                 className="flex items-center gap-2 px-6 py-4 bg-slate-50 text-slate-400 font-black uppercase text-[10px] hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all border border-slate-100"
                             >
-                                <Trash2 size={16} /> Reset
+                                <Trash2 size={16} /> {t('Reset')}
                             </button>
                         )}
 
@@ -216,7 +218,7 @@ export default function ExplorePage({
                                 onClick={() => setShowInfoModal(true)}
                                 className="flex items-center gap-2 px-6 py-4 bg-blue-50 text-blue-500 font-black uppercase text-[10px] hover:text-blue-600 hover:bg-blue-100 rounded-2xl transition-all border border-blue-100"
                             >
-                                <Info size={16} /> Ticket Rules
+                                <Info size={16} /> {t('Ticket Rules')}
                             </button>
                         )}
                     </div>
@@ -232,7 +234,7 @@ export default function ExplorePage({
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                             <input
                                 type="text"
-                                placeholder="Locate specific point..."
+                                placeholder={t('Locate specific point...')}
                                 className="w-full pl-12 pr-6 py-4 bg-white border border-slate-200 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
@@ -242,8 +244,8 @@ export default function ExplorePage({
 
                     <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
                         <div className="flex items-center justify-between px-4 mb-2">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Regional Point Registry</p>
-                            <span className="text-[8px] font-black bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full uppercase">{filteredStops.length} nodes</span>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Regional Point Registry')}</p>
+                            <span className="text-[8px] font-black bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full uppercase">{filteredStops.length} {t('nodes')}</span>
                         </div>
                         {filteredStops.length > 0 ? (
                             filteredStops.map(stop => (
@@ -258,10 +260,10 @@ export default function ExplorePage({
                                     <div className="text-left">
                                         <div className="flex items-center gap-2">
                                             <p className="text-sm font-black line-clamp-3 max-w-[180px] leading-tight">{stop.name}</p>
-                                            {pickup?.id === stop.id && <span className="text-[8px] bg-emerald-500 text-white px-1.5 py-0.5 rounded font-black uppercase">Start</span>}
-                                            {dropoff?.id === stop.id && <span className="text-[8px] bg-amber-500 text-white px-1.5 py-0.5 rounded font-black uppercase">End</span>}
+                                            {pickup?.id === stop.id && <span className="text-[8px] bg-emerald-500 text-white px-1.5 py-0.5 rounded font-black uppercase">{t('Start')}</span>}
+                                            {dropoff?.id === stop.id && <span className="text-[8px] bg-amber-500 text-white px-1.5 py-0.5 rounded font-black uppercase">{t('End')}</span>}
                                         </div>
-                                        <p className={`text-[10px] uppercase font-bold ${(pickup?.id === stop.id || dropoff?.id === stop.id) ? 'opacity-70' : 'text-slate-400'}`}>Node ID: {stop.id.split(':').pop()}</p>
+                                        <p className={`text-[10px] uppercase font-bold ${(pickup?.id === stop.id || dropoff?.id === stop.id) ? 'opacity-70' : 'text-slate-400'}`}>{t('Node ID')}: {stop.id.split(':').pop()}</p>
                                     </div>
                                     <ChevronRight size={16} className={(pickup?.id === stop.id || dropoff?.id === stop.id) ? 'opacity-50' : selectedPoint?.id === stop.id ? 'text-emerald-400' : 'text-slate-300'} />
                                 </button>
@@ -269,7 +271,7 @@ export default function ExplorePage({
                         ) : (
                             <div className="py-20 text-center opacity-40">
                                 <Activity className="mx-auto mb-4" />
-                                <p className="text-xs font-bold uppercase tracking-widest">No matching stops</p>
+                                <p className="text-xs font-bold uppercase tracking-widest">{t('No matching stops')}</p>
                             </div>
                         )}
                     </div>
@@ -316,13 +318,13 @@ export default function ExplorePage({
                                                             onClick={(e) => { e.stopPropagation(); setPickup(stop); }}
                                                             className="flex items-center justify-center gap-2 text-[10px] font-black uppercase bg-emerald-500 text-white px-3 py-2.5 rounded-xl hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
                                                         >
-                                                            <MapPin size={10} /> Set Startup
+                                                            <MapPin size={10} /> {t('Set Startup')}
                                                         </button>
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); setDropoff(stop); }}
                                                             className="flex items-center justify-center gap-2 text-[10px] font-black uppercase bg-amber-500 text-white px-3 py-2.5 rounded-xl hover:bg-amber-600 transition-colors shadow-lg shadow-amber-500/20"
                                                         >
-                                                            <Navigation2 size={10} /> Set Destination
+                                                            <Navigation2 size={10} /> {t('Set Destination')}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -345,7 +347,7 @@ export default function ExplorePage({
                     ) : (
                         <div className="py-24 text-center bg-white rounded-[3rem] border-2 border-dashed border-slate-200 h-full flex flex-col items-center justify-center">
                             <MapIcon className="mx-auto mb-6 text-slate-200" size={64} />
-                            <p className="text-slate-400 font-black text-xl">Select a regional dataset to activate spatial exploration.</p>
+                            <p className="text-slate-400 font-black text-xl">{t('Select a regional dataset to activate spatial exploration.')}</p>
                         </div>
                     )}
                 </div>
@@ -364,7 +366,7 @@ export default function ExplorePage({
 
                         <div className="mb-6 shrink-0">
                             <h3 className="text-2xl font-black text-slate-900 flex items-center gap-2">
-                                <Car className="text-emerald-500" /> Service Details
+                                <Car className="text-emerald-500" /> {t('Service Details')}
                             </h3>
                             <p className="text-slate-500 text-sm font-bold mt-1">{activeDataset.additionalInfo.service_name}</p>
                         </div>
@@ -374,17 +376,17 @@ export default function ExplorePage({
                             {activeDataset.additionalInfo.usage_fee && (
                                 <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
                                     <h4 className="text-xs font-black uppercase text-emerald-500 tracking-widest mb-3 border-b border-slate-200/50 pb-2">
-                                        Flex Transport Fares
+                                        {t('Flex Transport Fares')}
                                     </h4>
                                     <div className="space-y-4">
                                         {Object.entries(activeDataset.additionalInfo.usage_fee).map(([category, value]) => (
                                             <div key={category} className="space-y-1">
-                                                <p className="text-[10px] font-black uppercase text-slate-400">{formatKey(category)}</p>
+                                                <p className="text-[10px] font-black uppercase text-slate-400">{t(formatKey(category))}</p>
                                                 {typeof value === 'object' && value !== null ? (
                                                     Object.entries(value).map(([subKey, subValue]) => (
                                                         <div key={subKey} className="flex justify-between items-start pl-2">
                                                             <span className="text-sm font-bold text-slate-600">
-                                                                {typeof subKey === 'string' && subKey !== 'note' && isNaN(subKey) ? formatKey(subKey) : ''}
+                                                                {typeof subKey === 'string' && subKey !== 'note' && isNaN(subKey) ? t(formatKey(subKey)) : ''}
                                                                 {subKey === 'note' && <span className="text-amber-600 italic font-normal text-xs">{subValue}</span>}
                                                             </span>
                                                             {!Array.isArray(subValue) && typeof subValue !== 'object' && subKey !== 'note' && (
@@ -407,7 +409,7 @@ export default function ExplorePage({
                             {activeDataset.additionalInfo.important_notes && (
                                 <div className="bg-amber-50 p-5 rounded-2xl border border-amber-100">
                                     <h4 className="text-xs font-black uppercase text-amber-600 tracking-widest mb-3 border-b border-amber-200/50 pb-2">
-                                        Important Notes
+                                        {t('Important Notes')}
                                     </h4>
                                     <ul className="space-y-2">
                                         {activeDataset.additionalInfo.important_notes.map((note, idx) => (
@@ -423,7 +425,7 @@ export default function ExplorePage({
                             {activeDataset.additionalInfo.reservation_methods && (
                                 <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100">
                                     <h4 className="text-xs font-black uppercase text-blue-500 tracking-widest mb-3 border-b border-blue-200/50 pb-2">
-                                        How to Book
+                                        {t('How to Book')}
                                     </h4>
                                     <div className="space-y-3">
                                         {activeDataset.additionalInfo.reservation_methods.map((method, idx) => (
@@ -433,7 +435,7 @@ export default function ExplorePage({
                                         ))}
                                         {activeDataset.additionalInfo.reservation_window && (
                                             <div className="pt-2 text-xs font-bold text-slate-500 italic border-t border-blue-200/50 mt-2">
-                                                Window: {activeDataset.additionalInfo.reservation_window}
+                                                {t('Window')}: {activeDataset.additionalInfo.reservation_window}
                                             </div>
                                         )}
                                     </div>
