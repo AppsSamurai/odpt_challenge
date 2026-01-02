@@ -1,20 +1,40 @@
 {
-  "service_name": "Hakuba Night Demand Taxi (HND)",
-  "operating_hours": "17:00 - 23:00",
-  "operating_days": "December 15, 2025 (Monday) to February 28, 2026 (Saturday)",
-  "telephone_number_for_reservation": "Not available (App only)",
+  "service_name": {
+    "en": "Hakuba Night Demand Taxi (HND)",
+    "jp": "白馬ナイトデマンドタクシー"
+  },
+  "operating_hours": {
+    "en": "17:00 - 23:00",
+    "jp": "17:00 - 23:00"
+  },
+  "operating_days": {
+    "en": "December 15, 2025 (Monday) to February 28, 2026 (Saturday)",
+    "jp": "2025年12月15日(月) 〜 2026年2月28日(土)"
+  },
+  "telephone_number_for_reservation": {
+    "en": "Not available (App only)",
+    "jp": "利用不可 (アプリのみ)"
+  },
   "usage_fee": {
     "standard_fare": {
       "cash_or_other": 500,
       "in_app_credit_payment": 450
     },
     "discounted_fare": {
-      "eligible_groups": [
-        "Seniors (65+)",
-        "Physical Disability Certificate holders",
-        "Rehabilitation Certificate holders",
-        "Mental Disability Certificate holders"
-      ],
+      "eligible_groups": {
+        "en": [
+          "Seniors (65+)",
+          "Physical Disability Certificate holders",
+          "Rehabilitation Certificate holders",
+          "Mental Disability Certificate holders"
+        ],
+        "jp": [
+          "65歳以上の高齢者",
+          "身体障害者手帳をお持ちの方",
+          "療育手帳をお持ちの方",
+          "精神障害者保健福祉手帳をお持ちの方"
+        ]
+      },
       "cash_or_other": 450,
       "in_app_credit_payment": 405
     },
@@ -24,23 +44,57 @@
   },
   "reservation_methods": [
     {
-      "method": "Smartphone App",
-      "allowed_to": "Everyone",
-      "availability": "Same-day booking",
-      "note": "Reservations are made via the dedicated AI taxi app."
+      "method": {
+        "en": "Smartphone App",
+        "jp": "スマホアプリ"
+      },
+      "allowed_to": {
+        "en": "Everyone",
+        "jp": "どなたでも"
+      },
+      "availability": {
+        "en": "Same-day booking",
+        "jp": "当日予約のみ"
+      },
+      "note": {
+        "en": "Reservations are made via the dedicated AI taxi app.",
+        "jp": "専用AIタクシーアプリから予約してください。"
+      }
     },
     {
-      "method": "Telephone",
-      "allowed_to": "None",
-      "availability": "N/A",
-      "note": "Telephone reservations are not listed for the Night Demand service."
+      "method": {
+        "en": "Telephone",
+        "jp": "電話"
+      },
+      "allowed_to": {
+        "en": "None",
+        "jp": "なし"
+      },
+      "availability": {
+        "en": "N/A",
+        "jp": "N/A"
+      },
+      "note": {
+        "en": "Telephone reservations are not listed for the Night Demand service.",
+        "jp": "ナイトデマンドサービスでは電話予約を受け付けていません。"
+      }
     }
   ],
-  "reservation_window": "Same-day only",
+  "reservation_window": {
+    "en": "Same-day only",
+    "jp": "当日のみ"
+  },
   "additional_info_page": "https://www.vill.hakuba.lg.jp/gyosei/gyoseijoho/mizikanachiikikotsu/hakubademanndo/10312.html",
-  "important_notes": [
-    "Shared ride service; arrival times may vary depending on other passengers.",
-    "Luggage must be small enough to fit in your own seat area.",
-    "Ski and snowboard equipment is not allowed onboard."
-  ]
+  "important_notes": {
+    "en": [
+      "Shared ride service; arrival times may vary depending on other passengers.",
+      "Luggage must be small enough to fit in your own seat area.",
+      "Ski and snowboard equipment is not allowed onboard."
+    ],
+    "jp": [
+      "乗合サービスのため、他の乗客の状況により到着時間が前後することがあります。",
+      "荷物はご自身の座席範囲内に収まるものに限ります。",
+      "スキー・スノーボード用品の持ち込みはできません。"
+    ]
+  }
 }

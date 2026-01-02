@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavig
 import JSZip from 'jszip';
 
 // Utils & Constants
-import { API_KEY, ODPT_URL, INITIAL_HUBS, HUB_MAPPING, parseCSV, addMins, formatTime } from './app/utils';
+import { API_KEY, ODPT_URL, INITIAL_HUBS, HUB_MAPPING, parseCSV, addMins, formatTime, localizeData } from './app/utils';
 import { getTranslation } from './app/translations';
 
 // Components
@@ -24,7 +24,7 @@ function AppContent() {
     const view = location.pathname.split('/')[1] || 'planner';
     const setView = (v) => navigate(`/${v}`);
     const [language, setLanguage] = useState('jp');
-    const t = (key) => getTranslation(language, key);
+    const t = (key, params) => getTranslation(language, key, params);
 
     // --- State Management ---
     const [loading, setLoading] = useState(false);
@@ -47,7 +47,14 @@ function AppContent() {
     const [showIntermediary, setShowIntermediary] = useState(false);
     const [bookingDetails, setBookingDetails] = useState(null);
 
-    const activeDataset = datasets[activeDatasetIndex] || null;
+    const displayDatasets = useMemo(() => {
+        return datasets.map(ds => ({
+            ...ds,
+            additionalInfo: localizeData(ds.additionalInfo, language)
+        }));
+    }, [datasets, language]);
+
+    const activeDataset = displayDatasets[activeDatasetIndex] || null;
 
     // --- Data Processing ---
     const processGTFSFiles = async (files, setActive = true, demandFile = null) => {
@@ -210,7 +217,7 @@ function AppContent() {
             }
         });
         return { usage: filteredUsage, flows: filteredFlows };
-    }, [activeDataset, plannerTimeFilter]);
+    }, [activeDataset?.demandData, plannerTimeFilter]);
 
     const pointStats = useMemo(() => {
         if (!activeDataset || !activeDataset.demandData || !selectedPoint) return null;
@@ -253,7 +260,7 @@ function AppContent() {
             recommendation = `Strong cumulative demand (${totalAtPoint} events). Consider a permanent loop service for this location.`;
         }
         return { hours, serviceHours, startHour, endHour, peakHour, maxUsage, totalAtPoint, recommendation };
-    }, [activeDataset, selectedPoint, plannerTimeFilter]);
+    }, [activeDataset?.demandData, selectedPoint, plannerTimeFilter]);
 
     // --- Effects ---
     // Redirect to planner if active dataset changes while on confirmation page
@@ -479,7 +486,7 @@ function AppContent() {
             <Sidebar
                 view={view} setView={setView}
                 planner={planner} liveRouteData={liveRouteData} activeDataset={activeDataset}
-                datasets={datasets} activeDatasetIndex={activeDatasetIndex} setActiveDatasetIndex={setActiveDatasetIndex}
+                datasets={displayDatasets} activeDatasetIndex={activeDatasetIndex} setActiveDatasetIndex={setActiveDatasetIndex}
                 setPlanner={setPlanner} setSelectedPoint={setSelectedPoint}
                 plannerTimeFilter={plannerTimeFilter} setPlannerTimeFilter={setPlannerTimeFilter}
                 demandStats={demandStats} handleFileUpload={handleFileUpload}

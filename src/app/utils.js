@@ -67,3 +67,31 @@ export const parseCSV = (text) => {
 
 export const addMins = (date, mins) => new Date(date.getTime() + mins * 60000);
 export const formatTime = (date) => date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+export const localizeData = (data, locale) => {
+    if (!data) return data;
+    if (typeof data !== 'object') return data;
+
+    // Check if it's a localization object {en: ..., jp: ...}
+    const keys = Object.keys(data);
+    const hasEn = keys.includes('en');
+    const hasJp = keys.includes('jp') || keys.includes('ja');
+
+    if (hasEn && hasJp) {
+        // It is a localizable node
+        // Prefer desired locale (jp or ja), fallback to 'en', then first key
+        const target = (locale === 'jp' || locale === 'ja') ? (data.jp || data.ja) : data.en;
+        return target !== undefined ? target : data[keys[0]];
+    }
+
+    if (Array.isArray(data)) {
+        return data.map(item => localizeData(item, locale));
+    }
+
+    // Regular object, recurse values
+    const result = {};
+    for (const key in data) {
+        result[key] = localizeData(data[key], locale);
+    }
+    return result;
+};

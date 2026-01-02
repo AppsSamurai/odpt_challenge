@@ -1,51 +1,120 @@
 {
-    "service_name": "Hirakawa City Demand Transport (Norassa)",
-    "operating_hours": "08:30 - 18:00",
-    "operating_days": "Monday to Friday (Closed: Weekends, Public Holidays, and Year-end/New Year holidays Dec 29 – Jan 3)",
-    "telephone_number_for_reservation": "0172-55-5023",
+    "service_name": {
+        "en": "Hirakawa City Demand Transport (Norassa)",
+        "jp": "平川市デマンド交通「のらっさ」"
+    },
+    "operating_hours": {
+        "en": "08:30 - 18:00",
+        "jp": "08:30 - 18:00"
+    },
+    "operating_days": {
+        "en": "Monday to Friday (Closed: Weekends, Public Holidays, and Year-end/New Year holidays Dec 29 – Jan 3)",
+        "jp": "月〜金 (運休: 土日祝、年末年始 12/29〜1/3)"
+    },
+    "telephone_number_for_reservation": {
+        "en": "0172-55-5023",
+        "jp": "0172-55-5023"
+    },
     "usage_fee": {
         "standard_fare": {
             "adult_general": 300,
             "high_school_student": 300
         },
         "discounted_fare": {
-            "eligible_groups": [
-                "Elementary and Junior High school students",
-                "Disability certificate holders",
-                "Seniors (presumed, check local Ai-Taku equivalent cards)",
-                "Preschoolers (Free)"
-            ],
+            "eligible_groups": {
+                "en": [
+                    "Elementary and Junior High school students",
+                    "Disability certificate holders",
+                    "Seniors (presumed, check local Ai-Taku equivalent cards)",
+                    "Preschoolers (Free)"
+                ],
+                "jp": [
+                    "小・中学生",
+                    "障害者手帳をお持ちの方",
+                    "高齢者 (要確認)",
+                    "未就学児 (無料)"
+                ]
+            },
             "fare_per_ride": 100
         },
         "passes": {
-            "note": "Digital tickets and multi-ride passes may be available via the MONET app."
+            "note": {
+                "en": "Digital tickets and multi-ride passes may be available via the MONET app.",
+                "jp": "MONETアプリにてデジタルチケットや回数券が利用可能です。"
+            }
         }
     },
     "reservation_methods": [
         {
-            "method": "Smartphone App (MONET)",
-            "allowed_to": "Everyone",
-            "availability": "24 hours a day",
-            "note": "Reservations accepted from 1 week prior until 30 minutes before boarding."
+            "method": {
+                "en": "Smartphone App (MONET)",
+                "jp": "スマホアプリ (MONET)"
+            },
+            "allowed_to": {
+                "en": "Everyone",
+                "jp": "どなたでも"
+            },
+            "availability": {
+                "en": "24 hours a day",
+                "jp": "24時間受付"
+            },
+            "note": {
+                "en": "Reservations accepted from 1 week prior until 30 minutes before boarding.",
+                "jp": "1週間前から乗車30分前まで予約可能。"
+            }
         },
         {
-            "method": "LINE (Hirakawa City Official Account)",
-            "allowed_to": "Everyone",
-            "availability": "24 hours a day",
-            "note": "Reservations accepted from 1 week prior until 30 minutes before boarding."
+            "method": {
+                "en": "LINE (Hirakawa City Official Account)",
+                "jp": "LINE (平川市公式アカウント)"
+            },
+            "allowed_to": {
+                "en": "Everyone",
+                "jp": "どなたでも"
+            },
+            "availability": {
+                "en": "24 hours a day",
+                "jp": "24時間受付"
+            },
+            "note": {
+                "en": "Reservations accepted from 1 week prior until 30 minutes before boarding.",
+                "jp": "1週間前から乗車30分前まで予約可能。"
+            }
         },
         {
-            "method": "Telephone",
-            "allowed_to": "Everyone",
-            "availability": "08:30 - 18:00 (Operating days)",
-            "note": "Call the Norassa Reservation Center. Busy hours are typically in the morning."
+            "method": {
+                "en": "Telephone",
+                "jp": "電話"
+            },
+            "allowed_to": {
+                "en": "Everyone",
+                "jp": "どなたでも"
+            },
+            "availability": {
+                "en": "08:30 - 18:00 (Operating days)",
+                "jp": "08:30 - 18:00 (運行日)"
+            },
+            "note": {
+                "en": "Call the Norassa Reservation Center. Busy hours are typically in the morning.",
+                "jp": "のらっさ予約センターへお電話ください。午前中は混み合うことがあります。"
+            }
         }
     ],
-    "   ": "From 1 week in advance until 30 minutes before the scheduled ride",
+    "reservation_window": {
+        "en": "From 1 week in advance until 30 minutes before the scheduled ride",
+        "jp": "1週間前から乗車予定時刻の30分前まで"
+    },
     "additional_info_page": "https://www.city.hirakawa.lg.jp/kurashi/koutsu/norassa.html",
-    "important_notes": [
-        "If you are not at the stop at the reserved time, the vehicle will depart to the next destination.",
-        "Users must handle their own luggage during loading/unloading.",
-        "Ride-sharing is common; arrival times may vary depending on the route."
-    ]
+    "important_notes": {
+        "en": [
+            "If you are not at the stop at the reserved time, the vehicle will depart to the next destination.",
+            "Users must handle their own luggage during loading/unloading.",
+            "Ride-sharing is common; arrival times may vary depending on the route."
+        ],
+        "jp": [
+            "予約時間に停留所にいない場合、車両は次の目的地へ出発します。",
+            "荷物の積み下ろしは利用者ご自身でお願いします。",
+            "乗合のため、ルートにより到着時間が前後する場合があります。"
+        ]
+    }
 }

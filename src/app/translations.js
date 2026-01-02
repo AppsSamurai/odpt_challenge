@@ -1,5 +1,6 @@
 export const translations = {
     jp: {
+        "App Name": "結いリンク",
         // Navigation & Sidebar
         "Trip Planner": "乗換案内",
         "Explore Regional Hubs": "地域ハブ探索",
@@ -75,6 +76,13 @@ export const translations = {
         "Fri": "金",
         "Sat": "土",
         "Sun": "日",
+        "Monday": "月曜日",
+        "Tuesday": "火曜日",
+        "Wednesday": "水曜日",
+        "Thursday": "木曜日",
+        "Friday": "金曜日",
+        "Saturday": "土曜日",
+        "Sunday": "日曜日",
 
         // General
         "Language": "言語 / Language",
@@ -111,7 +119,7 @@ export const translations = {
         "Service Provider": "運行会社",
         "MONET User Guide": "MONET利用ガイド",
         "Scan to Download App": "アプリをダウンロード",
-        "Get MONET Move": "MONET Moveを入手",
+        "Get MONET APP": "MONETアプリを入手",
         "Scan the QR code below to download the official app.": "以下のQRコードをスキャンして公式アプリをダウンロードしてください。",
         "Done": "完了",
         "Done": "完了",
@@ -223,9 +231,30 @@ export const translations = {
         "Peak": "ピーク",
         "Standard": "通常",
         "Midpoint": "中間点",
-        "events": "件"
+        "events": "件",
+
+        // Fares
+        "Adult Standard": "大人 (標準)",
+        "Child Standard": "小人 (標準)",
+        "Adult Off Route Destination": "大人 (区域外)",
+        "Child Off Route Destination": "小人 (区域外)",
+        "Adult General": "大人 (一般)",
+        "High School Student": "高校生",
+        "Elementary Student": "小学生",
+        "Elementary Junior High Disability": "小・中学生・障害者",
+        "General": "一般",
+        "Residents Workers Students": "在住・在勤・在学",
+        "Others Tourists": "その他・観光客",
+        "Pre School Children": "未就学児",
+        "Adult": "大人",
+        "Child": "小人",
+        "Flex Transport Information": "Flex交通情報",
+        "Booking Rule Prefix": "出発の",
+        "Booking Rule Suffix": "前までに予約が必要です。",
+        "MINS": "分"
     },
     en: {
+        "App Name": "YuiLink",
         // Navigation & Sidebar
         "Trip Planner": "Trip Planner",
         "Explore Regional Hubs": "Explore Regional Hubs",
@@ -301,6 +330,13 @@ export const translations = {
         "Fri": "Fri",
         "Sat": "Sat",
         "Sun": "Sun",
+        "Monday": "Monday",
+        "Tuesday": "Tuesday",
+        "Wednesday": "Wednesday",
+        "Thursday": "Thursday",
+        "Friday": "Friday",
+        "Saturday": "Saturday",
+        "Sunday": "Sunday",
 
         // General
         "Language": "Language",
@@ -337,7 +373,7 @@ export const translations = {
         "Service Provider": "Service Provider",
         "MONET User Guide": "MONET User Guide",
         "Scan to Download App": "Scan to Download App",
-        "Get MONET Move": "Get MONET Move",
+        "Get MONET APP": "Get MONET APP",
         "Scan the QR code below to download the official app.": "Scan the QR code below to download the official app.",
         "Done": "Done",
         "Done": "Done",
@@ -449,10 +485,36 @@ export const translations = {
         "Peak": "Peak",
         "Standard": "Standard",
         "Midpoint": "Midpoint",
-        "events": "events"
+        "events": "events",
+
+        // Fares
+        "Adult Standard": "Adult Standard",
+        "Child Standard": "Child Standard",
+        "Adult Off Route Destination": "Adult Off Route Destination",
+        "Child Off Route Destination": "Child Off Route Destination",
+        "Adult General": "Adult General",
+        "High School Student": "High School Student",
+        "Elementary Student": "Elementary Student",
+        "Elementary Junior High Disability": "Elementary/Jr High/Disability",
+        "General": "General",
+        "Residents Workers Students": "Residents/Workers/Students",
+        "Others Tourists": "Others/Tourists",
+        "Pre School Children": "Pre-School Children",
+        "Adult": "Adult",
+        "Child": "Child",
+        "Flex Transport Information": "Flex Transport Information",
+        "Booking Rule Prefix": "You must book at least",
+        "Booking Rule Suffix": "before departure.",
+        "MINS": "MINS"
     }
 };
 
-export const getTranslation = (lang, key) => {
-    return translations[lang]?.[key] || key;
+export const getTranslation = (lang, key, params = {}) => {
+    let text = translations[lang]?.[key] || key;
+    if (params) {
+        Object.keys(params).forEach(p => {
+            text = text.replace(new RegExp(`{{${p}}}`, 'g'), params[p]);
+        });
+    }
+    return text;
 };

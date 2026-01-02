@@ -1,8 +1,20 @@
 {
-    "service_name": "Annaka City Shared (Nori-ai) Taxi / AI New Transport",
-    "operating_hours": "07:30 - 18:00 (Service times vary by morning/afternoon slots)",
-    "operating_days": "Monday to Saturday (Closed: Sundays, Public Holidays, and Year-end/New Year holidays Dec 30 – Jan 3)",
-    "telephone_number_for_reservation": "027-381-0888 (Annaka Taxi)",
+    "service_name": {
+        "en": "Annaka City Shared (Nori-ai) Taxi / AI New Transport",
+        "jp": "安中市乗合タクシー / AI新交通"
+    },
+    "operating_hours": {
+        "en": "07:30 - 18:00 (Service times vary by morning/afternoon slots)",
+        "jp": "07:30 - 18:00 (便により運行時間が異なります)"
+    },
+    "operating_days": {
+        "en": "Monday to Saturday (Closed: Sundays, Public Holidays, and Year-end/New Year holidays Dec 30 – Jan 3)",
+        "jp": "月曜日〜土曜日 (運休: 日曜・祝日・年末年始 12/30〜1/3)"
+    },
+    "telephone_number_for_reservation": {
+        "en": "027-381-0888 (Annaka Taxi)",
+        "jp": "027-381-0888 (安中タクシー)"
+    },
     "usage_fee": {
         "standard_fare": {
             "adult_standard": 200,
@@ -11,39 +23,87 @@
             "child_off_route_destination": 150
         },
         "discounted_fare": {
-            "eligible_groups": [
-                "Children (Elementary school students)",
-                "Pre-schoolers (Up to 2 free per accompanying adult)"
-            ],
+            "eligible_groups": {
+                "en": [
+                    "Children (Elementary school students)",
+                    "Pre-schoolers (Up to 2 free per accompanying adult)"
+                ],
+                "jp": [
+                    "子供（小学生）",
+                    "未就学児（保護者1名につき2名まで無料）"
+                ]
+            },
             "standard_fare": 100,
             "off_route_destination": 150
         },
-        "payment_methods": [
-            "Cash",
-            "Digital Regional Currency (UMECA)"
-        ]
+        "payment_methods": {
+            "en": [
+                "Cash",
+                "Digital Regional Currency (UMECA)"
+            ],
+            "jp": [
+                "現金",
+                "地域デジタル通貨 (UMECA)"
+            ]
+        }
     },
     "reservation_methods": [
         {
-            "method": "Telephone",
-            "allowed_to": "Everyone (No prior registration required for standard service)",
-            "availability": "Monday to Saturday, 09:00 - 17:00",
-            "note": "For morning slots, book by 15:00 the previous day. For afternoon slots, book by 12:00 the same day."
+            "method": {
+                "en": "Telephone",
+                "jp": "電話"
+            },
+            "allowed_to": {
+                "en": "Everyone (No prior registration required for standard service)",
+                "jp": "どなたでも（標準サービスは事前登録不要）"
+            },
+            "availability": {
+                "en": "Monday to Saturday, 09:00 - 17:00",
+                "jp": "月〜土 09:00 - 17:00"
+            },
+            "note": {
+                "en": "For morning slots, book by 15:00 the previous day. For afternoon slots, book by 12:00 the same day.",
+                "jp": "午前便は前日15:00まで、午後便は当日12:00までに予約してください。"
+            }
         },
         {
-            "method": "Smartphone App / LINE (AI New Transport Trial)",
-            "allowed_to": "Participants in the 'AI New Transport' demonstration area (Matsuida area)",
-            "availability": "24 hours for App/LINE; Phone support 07:00 - 18:00",
-            "note": "Reservations available from 7 days in advance until 20 minutes before departure."
+            "method": {
+                "en": "Smartphone App / LINE (AI New Transport Trial)",
+                "jp": "スマホアプリ / LINE (AI新交通実証実験)"
+            },
+            "allowed_to": {
+                "en": "Participants in the 'AI New Transport' demonstration area (Matsuida area)",
+                "jp": "「AI新交通」実証実験エリア（松井田エリア）のご利用者様"
+            },
+            "availability": {
+                "en": "24 hours for App/LINE; Phone support 07:00 - 18:00",
+                "jp": "アプリ/LINEは24時間受付、電話サポート 07:00 - 18:00"
+            },
+            "note": {
+                "en": "Reservations available from 7 days in advance until 20 minutes before departure.",
+                "jp": "7日前から出発20分前まで予約可能。"
+            }
         }
     ],
-    "reservation_window": "From 1 day in advance (for morning) or same-day (for afternoon)",
+    "reservation_window": {
+        "en": "From 1 day in advance (for morning) or same-day (for afternoon)",
+        "jp": "前日（午前便の場合）または当日（午後便の場合）から"
+    },
     "additional_info_page": "https://www.city.annaka.lg.jp/page/15433.html",
-    "important_notes": [
-        "Prior registration is NOT required for the standard shared taxi.",
-        "Registration IS required for the 'AI New Transport' trial service.",
-        "Service is restricted to one ride per hour per user.",
-        "Destinations outside defined zones are allowed for specific locations like Usui Hospital and local shopping centers (Yaoko/Sekichu).",
-        "Different service areas cannot be combined in a single ride."
-    ]
+    "important_notes": {
+        "en": [
+            "Prior registration is NOT required for the standard shared taxi.",
+            "Registration IS required for the 'AI New Transport' trial service.",
+            "Service is restricted to one ride per hour per user.",
+            "Destinations outside defined zones are allowed for specific locations like Usui Hospital and local shopping centers (Yaoko/Sekichu).",
+            "Different service areas cannot be combined in a single ride."
+        ],
+        "jp": [
+            "通常の乗合タクシーは事前登録不要です。",
+            "「AI新交通」実証実験サービスは事前登録が必要です。",
+            "1ユーザーにつき1時間あたり1回の利用制限があります。",
+            "指定ゾーン外への移動は、碓氷病院やヤオコー/セキチューなどの特定施設に限り可能です。",
+            "異なるサービスエリアをまたぐ利用はできません。"
+        ]
+    }
 }

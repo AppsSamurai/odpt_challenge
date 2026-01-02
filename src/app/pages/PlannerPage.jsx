@@ -185,7 +185,7 @@ export default function PlannerPage({
 
                     <div className="space-y-6">
                         <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200">
-                            <h4 className="font-black text-slate-900 mb-6 flex items-center gap-2"><Car size={20} className="text-emerald-500" /> Flex Transport Information</h4>
+                            <h4 className="font-black text-slate-900 mb-6 flex items-center gap-2"><Car size={20} className="text-emerald-500" /> {t('Flex Transport Information')}</h4>
 
                             {activeDataset?.additionalInfo ? (
                                 <div className="space-y-4">
@@ -287,7 +287,7 @@ export default function PlannerPage({
                                 </div>
                                 <div className="flex justify-between items-center mb-1 relative z-10">
                                     <span className="text-amber-800 font-black text-[10px] uppercase flex items-center gap-1.5">
-                                        <ShieldCheck size={12} /> Smart Connection Guard
+                                        <ShieldCheck size={12} /> {t('Smart Connection Guard')}
                                     </span>
                                     <div className="flex items-center gap-1">
                                         <span className="text-[8px] font-bold text-amber-600 uppercase animate-pulse">Active</span>

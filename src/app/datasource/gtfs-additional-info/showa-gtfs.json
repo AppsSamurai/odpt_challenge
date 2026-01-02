@@ -1,38 +1,82 @@
 {
-    "service_name": "Showa Village Demand Taxi",
-    "operating_hours": "08:00 - 17:00",
-    "operating_days": "Monday to Friday (Closed: Saturdays, Sundays, Public Holidays, and Year-end/New Year holidays Dec 29 – Jan 3)",
-    "telephone_number_for_reservation": "0278-25-3135",
+    "service_name": {
+        "en": "Showa Village Demand Taxi",
+        "jp": "昭和村デマンドタクシー"
+    },
+    "operating_hours": {
+        "en": "08:00 - 17:00",
+        "jp": "08:00 - 17:00"
+    },
+    "operating_days": {
+        "en": "Monday to Friday (Closed: Saturdays, Sundays, Public Holidays, and Year-end/New Year holidays Dec 29 – Jan 3)",
+        "jp": "月〜金 (運休: 土日祝、年末年始 12/29〜1/3)"
+    },
+    "telephone_number_for_reservation": {
+        "en": "0278-25-3135",
+        "jp": "0278-25-3135"
+    },
     "usage_fee": {
         "standard_fare": {
             "general_adult": 300,
             "high_school_student": 300
         },
         "discounted_fare": {
-            "eligible_groups": [
-                "Elementary and Junior High school students",
-                "Preschoolers (Free if accompanied by an adult; 100 yen otherwise)",
-                "Disability certificate holders"
-            ],
+            "eligible_groups": {
+                "en": [
+                    "Elementary and Junior High school students",
+                    "Preschoolers (Free if accompanied by an adult; 100 yen otherwise)",
+                    "Disability certificate holders"
+                ],
+                "jp": [
+                    "小・中学生",
+                    "未就学児 (保護者同伴無料、それ以外100円)",
+                    "障害者手帳をお持ちの方"
+                ]
+            },
             "fare_per_ride": 100
         },
         "passes": {
-            "note": "Commuter and student passes are available (refer to website for 1-month and 3-month rates)."
+            "note": {
+                "en": "Commuter and student passes are available (refer to website for 1-month and 3-month rates).",
+                "jp": "定期券（一般・通学）があります（1ヶ月・3ヶ月料金はWebサイト参照）。"
+            }
         }
     },
     "reservation_methods": [
         {
-            "method": "Telephone",
-            "allowed_to": "Residents only (Requires prior user registration)",
-            "availability": "08:00 - 17:00 (Weekdays)",
-            "note": "Reservations accepted from 1 week prior until 30 minutes before boarding."
+            "method": {
+                "en": "Telephone",
+                "jp": "電話"
+            },
+            "allowed_to": {
+                "en": "Residents only (Requires prior user registration)",
+                "jp": "住民のみ (要事前登録)"
+            },
+            "availability": {
+                "en": "08:00 - 17:00 (Weekdays)",
+                "jp": "08:00 - 17:00 (平日)"
+            },
+            "note": {
+                "en": "Reservations accepted from 1 week prior until 30 minutes before boarding.",
+                "jp": "乗車1週間前から30分前まで予約受付。"
+            }
         }
     ],
-    "reservation_window": "From 1 week in advance until 30 minutes before the scheduled ride",
+    "reservation_window": {
+        "en": "From 1 week in advance until 30 minutes before the scheduled ride",
+        "jp": "1週間前から乗車30分前まで"
+    },
     "additional_info_page": "https://www.vill.showa.gunma.jp/kurashi/kurashi/bus/2022-1209-1651-21.html",
-    "important_notes": [
-        "Prior user registration at the village office is mandatory.",
-        "Ride-sharing is required; arrival times are not guaranteed.",
-        "Service is restricted to travel within Showa Village and designated points in Numata City."
-    ]
+    "important_notes": {
+        "en": [
+            "Prior user registration at the village office is mandatory.",
+            "Ride-sharing is required; arrival times are not guaranteed.",
+            "Service is restricted to travel within Showa Village and designated points in Numata City."
+        ],
+        "jp": [
+            "役場での事前利用者登録が必須です。",
+            "乗合のため、到着時間は保証されません。",
+            "昭和村内および沼田市の指定箇所への移動に限られます。"
+        ]
+    }
 }

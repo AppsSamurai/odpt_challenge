@@ -35,7 +35,7 @@ export default function Sidebar({
                 <div className="bg-emerald-500 p-2.5 rounded-2xl shadow-lg shadow-emerald-500/20">
                     <Navigation size={22} />
                 </div>
-                <h1 className="text-xl font-black tracking-tight">Rural Sync</h1>
+                <h1 className="text-xl font-black tracking-tight">{t('App Name')}</h1>
             </div>
 
             <nav className="space-y-1 mb-8 shrink-0">

@@ -1,44 +1,100 @@
 {
-    "service_name": "Sakai City AI Demand Bus (Iko-sa)",
-    "operating_hours": "08:00 - 17:00",
-    "operating_days": "Monday to Friday (Closed: Weekends, Public Holidays, and Year-end/New Year holidays)",
-    "telephone_number_for_reservation": "0776-50-3330",
+    "service_name": {
+        "en": "Sakai City AI Demand Bus (Iko-sa)",
+        "jp": "坂井市AIデマンドバス「イコッサ」"
+    },
+    "operating_hours": {
+        "en": "08:00 - 17:00",
+        "jp": "08:00 - 17:00"
+    },
+    "operating_days": {
+        "en": "Monday to Friday (Closed: Weekends, Public Holidays, and Year-end/New Year holidays)",
+        "jp": "月〜金 (運休: 土日祝、年末年始)"
+    },
+    "telephone_number_for_reservation": {
+        "en": "0776-50-3330",
+        "jp": "0776-50-3330"
+    },
     "usage_fee": {
         "standard_fare": {
             "adult": 500,
             "elementary_student": 250
         },
         "discounted_fare": {
-            "eligible_groups": [
-                "Seniors (65+ with 'Iko-sa' card)",
-                "Disability certificate holders",
-                "Infants (Free with adult)"
-            ],
+            "eligible_groups": {
+                "en": [
+                    "Seniors (65+ with 'Iko-sa' card)",
+                    "Disability certificate holders",
+                    "Infants (Free with adult)"
+                ],
+                "jp": [
+                    "65歳以上の高齢者 (「イコッサ」カード提示)",
+                    "障害者手帳をお持ちの方",
+                    "幼児 (同伴者ありの場合無料)"
+                ]
+            },
             "fare_per_ride": 250
         },
         "passes": {
-            "note": "A discounted 'Iko-sa' card registration is required for senior pricing."
+            "note": {
+                "en": "A discounted 'Iko-sa' card registration is required for senior pricing.",
+                "jp": "高齢者割引には「イコッサ」カードの事前登録が必要です。"
+            }
         }
     },
     "reservation_methods": [
         {
-            "method": "Smartphone App (SAVS)",
-            "allowed_to": "Everyone (Registration required via app)",
-            "availability": "24 hours a day",
-            "note": "The most efficient way to book and track the bus location in real-time."
+            "method": {
+                "en": "Smartphone App (SAVS)",
+                "jp": "スマホアプリ (SAVS)"
+            },
+            "allowed_to": {
+                "en": "Everyone (Registration required via app)",
+                "jp": "どなたでも (アプリから要登録)"
+            },
+            "availability": {
+                "en": "24 hours a day",
+                "jp": "24時間受付"
+            },
+            "note": {
+                "en": "The most efficient way to book and track the bus location in real-time.",
+                "jp": "リアルタイムでバス位置を確認・予約できる最も効率的な方法です。"
+            }
         },
         {
-            "method": "Telephone",
-            "allowed_to": "Everyone",
-            "availability": "08:00 - 16:30 (Weekdays)",
-            "note": "Call the dedicated reservation center; avoid busy morning hours if possible."
+            "method": {
+                "en": "Telephone",
+                "jp": "電話"
+            },
+            "allowed_to": {
+                "en": "Everyone",
+                "jp": "どなたでも"
+            },
+            "availability": {
+                "en": "08:00 - 16:30 (Weekdays)",
+                "jp": "08:00 - 16:30 (平日)"
+            },
+            "note": {
+                "en": "Call the dedicated reservation center; avoid busy morning hours if possible.",
+                "jp": "専用予約センターへお電話ください。朝の混雑時間を避けてご連絡ください。"
+            }
         }
     ],
-    "reservation_window": "From 1 week in advance until 30 minutes before boarding",
+    "reservation_window": {
+        "en": "From 1 week in advance until 30 minutes before boarding",
+        "jp": "1週間前から乗車30分前まで"
+    },
     "additional_info_page": "https://www.city.fukui-sakai.lg.jp/kokyokotsu/kurashi/toshi-keikaku/kotsu/on-demand.html",
-    "important_notes": [
-        "This is an AI-optimized routing system; pickup times may shift slightly.",
-        "Registration is required for all users either via the app or by submitting a paper form.",
-        "Operating area covers the Mikuni and Maruoka regions primarily."
-    ]
+    "important_notes": {
+        "en": [
+            "This is an AI-optimized routing system; pickup times may shift slightly.",
+            "Registration is required for all users either via the app or by submitting a paper form.",
+            "Operating area covers the Mikuni and Maruoka regions primarily."
+        ],
+        "jp": [
+            "AI最適化配車システムのため、お迎え時間が多少前後する場合があります。",
+            "ご利用にはアプリまたは書面による事前登録が必要です。",
+            "運行エリアは主に三国・丸岡エリアです。"
+        ]
+    }
 }

@@ -1,38 +1,82 @@
 {
-    "service_name": "Tamamura Town Demand Taxi (Tamarin-go)",
-    "operating_hours": "08:30 - 17:30",
-    "operating_days": "Monday to Saturday (Closed: Sundays and Year-end/New Year holidays Dec 29 – Jan 3)",
-    "telephone_number_for_reservation": "0270-64-1111",
+    "service_name": {
+        "en": "Tamamura Town Demand Taxi (Tamarin-go)",
+        "jp": "玉村町デマンドタクシー「たまりん号」"
+    },
+    "operating_hours": {
+        "en": "08:30 - 17:30",
+        "jp": "08:30 - 17:30"
+    },
+    "operating_days": {
+        "en": "Monday to Saturday (Closed: Sundays and Year-end/New Year holidays Dec 29 – Jan 3)",
+        "jp": "月〜土 (運休: 日曜、年末年始 12/29〜1/3)"
+    },
+    "telephone_number_for_reservation": {
+        "en": "0270-64-1111",
+        "jp": "0270-64-1111"
+    },
     "usage_fee": {
         "standard_fare": {
             "general_adult": 300,
             "children_over_7": 300
         },
         "discounted_fare": {
-            "eligible_groups": [
-                "Seniors (75+)",
-                "Disability certificate holders",
-                "Children under 6 (Free)"
-            ],
+            "eligible_groups": {
+                "en": [
+                    "Seniors (75+)",
+                    "Disability certificate holders",
+                    "Children under 6 (Free)"
+                ],
+                "jp": [
+                    "75歳以上の高齢者",
+                    "障害者手帳をお持ちの方",
+                    "未就学児 (無料)"
+                ]
+            },
             "fare_per_ride": 100
         },
         "passes": {
-            "note": "Ticket books (11 tickets for the price of 10) are available for purchase."
+            "note": {
+                "en": "Ticket books (11 tickets for the price of 10) are available for purchase.",
+                "jp": "回数券（10回分の料金で11枚綴り）を販売しています。"
+            }
         }
     },
     "reservation_methods": [
         {
-            "method": "Telephone",
-            "allowed_to": "Registered residents only",
-            "availability": "08:00 - 17:00 (Operating days)",
-            "note": "Reservations must be made at least 30 minutes prior to use."
+            "method": {
+                "en": "Telephone",
+                "jp": "電話"
+            },
+            "allowed_to": {
+                "en": "Registered residents only",
+                "jp": "登録済み住民のみ"
+            },
+            "availability": {
+                "en": "08:00 - 17:00 (Operating days)",
+                "jp": "08:00 - 17:00 (運行日)"
+            },
+            "note": {
+                "en": "Reservations must be made at least 30 minutes prior to use.",
+                "jp": "利用30分前までに予約が必要です。"
+            }
         }
     ],
-    "reservation_window": "From 1 week in advance until 30 minutes before boarding",
+    "reservation_window": {
+        "en": "From 1 week in advance until 30 minutes before boarding",
+        "jp": "1週間前から乗車30分前まで"
+    },
     "additional_info_page": "https://www.town.tamamura.lg.jp/docs/2024072500020/",
-    "important_notes": [
-        "Users must complete a one-time registration at the Town Hall.",
-        "Pickup and drop-off are between designated 'Common Points' or private homes (for registered residents).",
-        "Wait times may occur due to the shared nature of the service."
-    ]
+    "important_notes": {
+        "en": [
+            "Users must complete a one-time registration at the Town Hall.",
+            "Pickup and drop-off are between designated 'Common Points' or private homes (for registered residents).",
+            "Wait times may occur due to the shared nature of the service."
+        ],
+        "jp": [
+            "役場での初回利用者登録が必要です。",
+            "乗降は指定の「共通乗降場」または自宅（登録済み住民のみ）間で行われます。",
+            "乗合のため待ち時間が発生する場合があります。"
+        ]
+    }
 }

@@ -1,20 +1,40 @@
 {
-  "service_name": "Hakuba Demand Taxi (Fure-AI)",
-  "operating_hours": "08:00 - 17:00",
-  "operating_days": "365 days a year (Daily)",
-  "telephone_number_for_reservation": "0261-72-5000",
+  "service_name": {
+    "en": "Hakuba Demand Taxi (Fure-AI)",
+    "jp": "白馬村デマンドタクシー（ふれあい号）"
+  },
+  "operating_hours": {
+    "en": "08:00 - 17:00",
+    "jp": "08:00 - 17:00"
+  },
+  "operating_days": {
+    "en": "365 days a year (Daily)",
+    "jp": "毎日運行（365日）"
+  },
+  "telephone_number_for_reservation": {
+    "en": "0261-72-5000",
+    "jp": "0261-72-5000"
+  },
   "usage_fee": {
     "standard_fare": {
       "cash_or_other": 300,
       "in_app_credit_payment": 270
     },
     "discounted_fare": {
-      "eligible_groups": [
-        "Seniors (65+)",
-        "Physical Disability Certificate holders",
-        "Rehabilitation Certificate holders",
-        "Mental Disability Certificate holders"
-      ],
+      "eligible_groups": {
+        "en": [
+          "Seniors (65+)",
+          "Physical Disability Certificate holders",
+          "Rehabilitation Certificate holders",
+          "Mental Disability Certificate holders"
+        ],
+        "jp": [
+          "65歳以上の高齢者",
+          "身体障害者手帳をお持ちの方",
+          "療育手帳をお持ちの方",
+          "精神障害者保健福祉手帳をお持ちの方"
+        ]
+      },
       "cash_or_other": 270,
       "in_app_credit_payment": 243
     },
@@ -25,23 +45,57 @@
   },
   "reservation_methods": [
     {
-      "method": "Smartphone App",
-      "allowed_to": "Everyone",
-      "availability": "24 hours a day, 365 days a year",
-      "note": "Required for Digital Pass users. Not applicable for home pickup/drop-off."
+      "method": {
+        "en": "Smartphone App",
+        "jp": "スマホアプリ"
+      },
+      "allowed_to": {
+        "en": "Everyone",
+        "jp": "どなたでも"
+      },
+      "availability": {
+        "en": "24 hours a day, 365 days a year",
+        "jp": "365日24時間受付"
+      },
+      "note": {
+        "en": "Required for Digital Pass users. Not applicable for home pickup/drop-off.",
+        "jp": "定期券利用者に必須。自宅送迎には対応していません。"
+      }
     },
     {
-      "method": "Telephone",
-      "allowed_to": "Hakuba Village residents only",
-      "availability": "Monday to Friday, 08:30 - 17:00",
-      "note": "Required for users requesting home pickup/drop-off (requires prior registration)."
+      "method": {
+        "en": "Telephone",
+        "jp": "電話"
+      },
+      "allowed_to": {
+        "en": "Hakuba Village residents only",
+        "jp": "白馬村住民のみ"
+      },
+      "availability": {
+        "en": "Monday to Friday, 08:30 - 17:00",
+        "jp": "月〜金 08:30 - 17:00"
+      },
+      "note": {
+        "en": "Required for users requesting home pickup/drop-off (requires prior registration).",
+        "jp": "自宅送迎利用者に必須（要事前登録）。"
+      }
     }
   ],
-  "reservation_window": "From 3 days in advance until the day of use",
+  "reservation_window": {
+    "en": "From 3 days in advance until the day of use",
+    "jp": "利用日の3日前から当日まで"
+  },
   "additional_info_page": "https://www.vill.hakuba.lg.jp/gyosei/gyoseijoho/mizikanachiikikotsu/hakubademanndo/10001.html",
-  "important_notes": [
-    "Shared ride service; wait times and arrival times may vary.",
-    "Luggage is limited to what fits in your own seat area.",
-    "Ski and snowboard equipment is not allowed onboard."
-  ]
+  "important_notes": {
+    "en": [
+      "Shared ride service; wait times and arrival times may vary.",
+      "Luggage is limited to what fits in your own seat area.",
+      "Ski and snowboard equipment is not allowed onboard."
+    ],
+    "jp": [
+      "乗合サービスのため、待ち時間や到着時間が前後することがあります。",
+      "荷物はご自身の座席範囲内に収まるものに限ります。",
+      "スキー・スノーボード用品の持ち込みはできません。"
+    ]
+  }
 }

@@ -152,7 +152,7 @@ export default function BookingConfirmationPage({
                         {t('Action Required')}
                     </p>
                     <p className="text-amber-900 text-sm font-bold leading-relaxed">
-                        {t('Strict Notice Policy')}: You must book at least <span className="bg-amber-500 text-white px-1.5 py-0.5 rounded text-xs font-black mx-1 inline-block transform -skew-x-6">30 MINS</span> before departure.
+                        {t('Strict Notice Policy')}: {t('Booking Rule Prefix')} <span className="bg-amber-500 text-white px-1.5 py-0.5 rounded text-xs font-black mx-1 inline-block transform -skew-x-6">{noticeMinutes} {t('MINS')}</span> {t('Booking Rule Suffix')}
                     </p>
                 </div>
             </div>
@@ -439,19 +439,51 @@ export default function BookingConfirmationPage({
                             <X size={20} className="text-slate-500" />
                         </button>
 
-                        <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-6 text-slate-900">
-                            <Smartphone size={32} />
+                        <div className="w-20 h-20 bg-white rounded-[1.2rem] shadow-xl shadow-slate-200 border border-slate-100 flex items-center justify-center mb-6 overflow-hidden">
+                            <img src="/favicon.png" alt="MONET App" className="w-full h-full object-cover" />
                         </div>
 
                         <h3 className="text-2xl font-black text-slate-900 mb-2">
-                            {t('Get MONET Move')}
+                            {t('Get MONET APP')}
                         </h3>
-                        <p className="text-slate-500 text-sm font-bold leading-relaxed mb-8">
+                        <p className="text-slate-500 text-sm font-bold leading-relaxed mb-6">
                             {t('Scan the QR code below to download the official app.')}
                         </p>
 
                         <div className="bg-white p-4 rounded-3xl shadow-lg border-2 border-slate-100 mb-6">
                             <img src="/monet_qr.png" alt="Scan QR Code" className="w-48 h-48 object-contain" />
+                        </div>
+
+                        {/* App Store Buttons */}
+                        <div className="flex gap-3 mb-6 w-full justify-center">
+                            <a
+                                href="https://apps.apple.com/jp/app/monet/id1540187817"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 bg-black text-white py-2 px-3 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors"
+                            >
+                                <svg viewBox="0 0 384 512" fill="currentColor" className="w-5 h-5">
+                                    <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 46.9 126.7 89.8 126.7 30.8 0 38.5-16.8 61-16.8 24 0 35.7 17 63.3 17 41.2 0 71.8-77.3 84.4-118.8-1.9-.9-4-1.9-5.8-2.9-38.3 1-52.6-9.1-52.4-91.2zM250 87.1c17-21.3 32.3-39.6 30.2-66.2-26 2.3-51.5 17.6-67 43.1-15.3 22-26.7 47.7-23.2 73.1 27 2 54.3-17.3 60-50z" />
+                                </svg>
+                                <div className="text-left">
+                                    <p className="text-[8px] leading-none font-bold opacity-80">Download on the</p>
+                                    <p className="text-xs font-black leading-tight">App Store</p>
+                                </div>
+                            </a>
+                            <a
+                                href="https://play.google.com/store/apps/details?id=jp.co.monet_technologies.monet_life_app.passenger"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 bg-black text-white py-2 px-3 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors"
+                            >
+                                <svg viewBox="0 0 512 512" fill="currentColor" className="w-5 h-5">
+                                    <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z" />
+                                </svg>
+                                <div className="text-left">
+                                    <p className="text-[8px] leading-none font-bold opacity-80">GET IT ON</p>
+                                    <p className="text-xs font-black leading-tight">Google Play</p>
+                                </div>
+                            </a>
                         </div>
 
                         <div className="w-full space-y-3">
