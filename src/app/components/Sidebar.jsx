@@ -8,7 +8,8 @@ import {
     Plus,
     FileText,
     CheckCircle2,
-    BarChart3
+    BarChart3,
+    Book
 } from 'lucide-react';
 import { REGIONAL_DEFAULTS, INITIAL_HUBS } from '../utils';
 
@@ -59,6 +60,12 @@ export default function Sidebar({
                     className={`w-full flex items-center gap-3 p-4 rounded-2xl font-bold transition-all ${view === 'insights' ? 'bg-white/10 text-white' : 'hover:bg-white/5'}`}
                 >
                     <BarChart3 size={18} className="text-amber-400" /> {t('City Planner')}
+                </button>
+                <button
+                    onClick={() => setView('manual')}
+                    className={`w-full flex items-center gap-3 p-4 rounded-2xl font-bold transition-all ${view === 'manual' ? 'bg-white/10 text-white' : 'hover:bg-white/5'}`}
+                >
+                    <Book size={18} className="text-blue-400" /> {t('Manual')}
                 </button>
             </nav>
 

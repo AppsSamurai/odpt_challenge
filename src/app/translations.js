@@ -1,6 +1,6 @@
 export const translations = {
     jp: {
-        "App Name": "結いリンク",
+        "App Name": "結フレックス",
         // Navigation & Sidebar
         "Trip Planner": "乗換案内",
         "Explore Regional Hubs": "地域ハブ探索",
@@ -23,6 +23,22 @@ export const translations = {
         "Permanent Bus Candidate": "定期バス路線候補",
         "Hub Capacity Warning": "ハブ容量警告",
         "No patterns in selected window...": "選択期間のパターンなし",
+        "App Manual": "アプリの使い方",
+        "Manual": "使い方マニュアル",
+        "Comprehensive guide to using the Multi-Modal Sync application.": "マルチモーダル同期アプリの包括的な利用ガイド。",
+        "The Trip Planner is the core of the application. Explore optimized routes that combine high-speed rail with regional on-demand transit.": "乗換案内は本アプリの中核機能です。新幹線と地域のオンデマンド交通を組み合わせた最適なルートを探索できます。",
+        "Select your Origin (Major Hub) and Destination (Regional Stop).": "出発地（主要ハブ）と目的地（地域バス停）を選択します。",
+        "View the generated \"Integrated Journey\" showing rail leg, transfer logic, and the final on-demand leg.": "生成された「統合ルート案内」で、鉄道路線、乗換案内、および最終的なオンデマンド区間を確認します。",
+        "Click \"Reserve All Segments\" to simulate a booking.": "「全区間を予約」をクリックして予約シミュレーションを行います。",
+        "Visually explore the coverage area of specific regional services.": "特定地域のサービスエリアを地図上で視覚的に探索します。",
+        "Click on different colored markers on the map to see stop names and details.": "地図上の色付きマーカーをクリックして、停留所名や詳細を確認します。",
+        "Use the \"Set Startup\" and \"Set Destination\" buttons in the popup to quickly route from the map.": "ポップアップ内の「出発地に設定」「目的地に設定」ボタンを使って、地図から素早くルート検索を行います。",
+        "For planners and officials: Analyze demand patterns to improve infrastructure.": "計画担当者および自治体向け：需要パターンを分析し、インフラ改善に役立てます。",
+        "View \"Demand Heatmaps\" to see where usage is concentrated.": "「需要ヒートマップ」で利用が集中している場所を確認します。",
+        "Check \"Infrastructure Insights\" in the sidebar for recommendations like \"Permanent Bus Candidate\".": "サイドバーの「インフラ分析」で、「定期バス路線候補」などの提案を確認します。",
+        "Real-time synchronization engine state monitoring.": "リアルタイム同期エンジンの状態監視。",
+        "The sidebar widget shows the current status of the mainline rail connection.": "サイドバーのウィジェットに、主要鉄道路線の現在の運行状況が表示されます。",
+        "If a delay is detected, it will display the delay time and the \"Smart Connection Guard\" will adjust pickup times.": "遅延が検知された場合、遅延時間が表示され、「スマート接続ガード」が配車時間を自動調整します。",
 
         // Planner Page
         "Tokyo ➔ Region Planner": "東京 ➔ 地域移動プランナー",
@@ -254,7 +270,7 @@ export const translations = {
         "MINS": "分"
     },
     en: {
-        "App Name": "YuiLink",
+        "App Name": "YuiFlex",
         // Navigation & Sidebar
         "Trip Planner": "Trip Planner",
         "Explore Regional Hubs": "Explore Regional Hubs",
@@ -277,6 +293,22 @@ export const translations = {
         "Permanent Bus Candidate": "Permanent Bus Candidate",
         "Hub Capacity Warning": "Hub Capacity Warning",
         "No patterns in selected window...": "No patterns in selected window...",
+        "App Manual": "App Manual",
+        "Manual": "Manual",
+        "Comprehensive guide to using the Multi-Modal Sync application.": "Comprehensive guide to using the Multi-Modal Sync application.",
+        "The Trip Planner is the core of the application. Explore optimized routes that combine high-speed rail with regional on-demand transit.": "The Trip Planner is the core of the application. Explore optimized routes that combine high-speed rail with regional on-demand transit.",
+        "Select your Origin (Major Hub) and Destination (Regional Stop).": "Select your Origin (Major Hub) and Destination (Regional Stop).",
+        "View the generated \"Integrated Journey\" showing rail leg, transfer logic, and the final on-demand leg.": "View the generated \"Integrated Journey\" showing rail leg, transfer logic, and the final on-demand leg.",
+        "Click \"Reserve All Segments\" to simulate a booking.": "Click \"Reserve All Segments\" to simulate a booking.",
+        "Visually explore the coverage area of specific regional services.": "Visually explore the coverage area of specific regional services.",
+        "Click on different colored markers on the map to see stop names and details.": "Click on different colored markers on the map to see stop names and details.",
+        "Use the \"Set Startup\" and \"Set Destination\" buttons in the popup to quickly route from the map.": "Use the \"Set Startup\" and \"Set Destination\" buttons in the popup to quickly route from the map.",
+        "For planners and officials: Analyze demand patterns to improve infrastructure.": "For planners and officials: Analyze demand patterns to improve infrastructure.",
+        "View \"Demand Heatmaps\" to see where usage is concentrated.": "View \"Demand Heatmaps\" to see where usage is concentrated.",
+        "Check \"Infrastructure Insights\" in the sidebar for recommendations like \"Permanent Bus Candidate\".": "Check \"Infrastructure Insights\" in the sidebar for recommendations like \"Permanent Bus Candidate\".",
+        "Real-time synchronization engine state monitoring.": "Real-time synchronization engine state monitoring.",
+        "The sidebar widget shows the current status of the mainline rail connection.": "The sidebar widget shows the current status of the mainline rail connection.",
+        "If a delay is detected, it will display the delay time and the \"Smart Connection Guard\" will adjust pickup times.": "If a delay is detected, it will display the delay time and the \"Smart Connection Guard\" will adjust pickup times.",
 
         // Planner Page
         "Tokyo ➔ Region Planner": "Tokyo ➔ Region Planner",

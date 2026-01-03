@@ -14,6 +14,7 @@ import PlannerPage from './app/pages/PlannerPage';
 import ExplorePage from './app/pages/ExplorePage';
 import DemandAnalysisPage from './app/pages/DemandAnalysisPage';
 import BookingConfirmationPage from './app/pages/BookingConfirmationPage';
+import ManualPage from './app/pages/ManualPage';
 
 // Leaflet styles
 import 'leaflet/dist/leaflet.css';
@@ -543,6 +544,12 @@ function AppContent() {
                         <BookingConfirmationPage
                             bookingDetails={bookingDetails}
                             onBack={() => navigate(-1)}
+                            language={language} t={t}
+                        />
+                    } />
+
+                    <Route path="/manual" element={
+                        <ManualPage
                             language={language} t={t}
                         />
                     } />
