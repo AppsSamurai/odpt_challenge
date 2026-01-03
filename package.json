@@ -1,9 +1,9 @@
 {
-    "name": "odpt-comfort-advisor",
+    "name": "yui-flex",
     "private": true,
     "version": "0.1.0",
     "type": "module",
-    "homepage": "https://appssamurai.github.io/",
+    "homepage": "https://appssamurai.github.io/odpt_challenge/",
     "scripts": {
         "dev": "vite",
         "build": "vite build",

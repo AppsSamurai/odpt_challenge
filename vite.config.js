@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-const BASE = "/"; // change to "/ODPT/" if needed
+const BASE = "/odpt_challenge/";
 
 export default defineConfig({
     plugins: [react()],

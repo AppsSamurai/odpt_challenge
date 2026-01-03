@@ -17,6 +17,8 @@ import {
     FileText
 } from 'lucide-react';
 import { addMins, formatTime } from '../utils';
+import monetQr from '../assets/monet_qr.png';
+import monetIcon from '../assets/monet-icon.png';
 
 
 export default function BookingConfirmationPage({
@@ -440,7 +442,7 @@ export default function BookingConfirmationPage({
                         </button>
 
                         <div className="w-20 h-20 bg-white rounded-[1.2rem] shadow-xl shadow-slate-200 border border-slate-100 flex items-center justify-center mb-6 overflow-hidden">
-                            <img src="/favicon.png" alt="MONET App" className="w-full h-full object-cover" />
+                            <img src={monetIcon} alt="MONET App" className="w-full h-full object-cover" />
                         </div>
 
                         <h3 className="text-2xl font-black text-slate-900 mb-2">
@@ -451,7 +453,7 @@ export default function BookingConfirmationPage({
                         </p>
 
                         <div className="bg-white p-4 rounded-3xl shadow-lg border-2 border-slate-100 mb-6">
-                            <img src="/monet_qr.png" alt="Scan QR Code" className="w-48 h-48 object-contain" />
+                            <img src={monetQr} alt="Scan QR Code" className="w-48 h-48 object-contain" />
                         </div>
 
                         {/* App Store Buttons */}
