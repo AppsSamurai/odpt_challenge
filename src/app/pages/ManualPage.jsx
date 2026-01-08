@@ -35,7 +35,7 @@ export default function ManualPage({ t }) {
                         </li>
                         <li className="flex gap-3 text-sm font-bold text-slate-700">
                             <span className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-500">3</span>
-                            {t('Click "Reserve All Segments" to simulate a booking.')}
+                            {t('Click "Reserve Regional Service" to simulate a booking.')}
                         </li>
                     </ul>
                 </div>

@@ -29,7 +29,7 @@ export const translations = {
         "The Trip Planner is the core of the application. Explore optimized routes that combine high-speed rail with regional on-demand transit.": "乗換案内は本アプリの中核機能です。新幹線と地域のオンデマンド交通を組み合わせた最適なルートを探索できます。",
         "Select your Origin (Major Hub) and Destination (Regional Stop).": "出発地（主要ハブ）と目的地（地域バス停）を選択します。",
         "View the generated \"Integrated Journey\" showing rail leg, transfer logic, and the final on-demand leg.": "生成された「統合ルート案内」で、鉄道路線、乗換案内、および最終的なオンデマンド区間を確認します。",
-        "Click \"Reserve All Segments\" to simulate a booking.": "「全区間を予約」をクリックして予約シミュレーションを行います。",
+        "Click \"Reserve Regional Service\" to simulate a booking.": "「地域交通サービスを予約」をクリックして予約シミュレーションを行います。",
         "Visually explore the coverage area of specific regional services.": "特定地域のサービスエリアを地図上で視覚的に探索します。",
         "Click on different colored markers on the map to see stop names and details.": "地図上の色付きマーカーをクリックして、停留所名や詳細を確認します。",
         "Use the \"Set Startup\" and \"Set Destination\" buttons in the popup to quickly route from the map.": "ポップアップ内の「出発地に設定」「目的地に設定」ボタンを使って、地図から素早くルート検索を行います。",
@@ -50,7 +50,7 @@ export const translations = {
         "Find Route": "ルート検索",
         "Integrated Journey": "統合ルート案内",
         "Total Fare": "合計運賃",
-        "Reserve All Segments": "全区間を予約",
+        "Reserve Regional Service": "地域交通サービスを予約",
 
         // Demand Analysis
         "Demand Analysis": "需要分析",
@@ -299,7 +299,7 @@ export const translations = {
         "The Trip Planner is the core of the application. Explore optimized routes that combine high-speed rail with regional on-demand transit.": "The Trip Planner is the core of the application. Explore optimized routes that combine high-speed rail with regional on-demand transit.",
         "Select your Origin (Major Hub) and Destination (Regional Stop).": "Select your Origin (Major Hub) and Destination (Regional Stop).",
         "View the generated \"Integrated Journey\" showing rail leg, transfer logic, and the final on-demand leg.": "View the generated \"Integrated Journey\" showing rail leg, transfer logic, and the final on-demand leg.",
-        "Click \"Reserve All Segments\" to simulate a booking.": "Click \"Reserve All Segments\" to simulate a booking.",
+        "Click \"Reserve Regional Service\" to simulate a booking.": "Click \"Reserve Regional Service\" to simulate a booking.",
         "Visually explore the coverage area of specific regional services.": "Visually explore the coverage area of specific regional services.",
         "Click on different colored markers on the map to see stop names and details.": "Click on different colored markers on the map to see stop names and details.",
         "Use the \"Set Startup\" and \"Set Destination\" buttons in the popup to quickly route from the map.": "Use the \"Set Startup\" and \"Set Destination\" buttons in the popup to quickly route from the map.",
@@ -320,7 +320,7 @@ export const translations = {
         "Find Route": "Find Route",
         "Integrated Journey": "Integrated Journey",
         "Total Fare": "Total Fare",
-        "Reserve All Segments": "Reserve All Segments",
+        "Reserve Regional Service": "Reserve Regional Service",
 
         // Demand Analysis
         "Demand Analysis": "Demand Analysis",

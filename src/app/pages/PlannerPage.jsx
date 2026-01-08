@@ -178,7 +178,7 @@ export default function PlannerPage({
 
                                 className="w-full mt-8 bg-emerald-500 hover:bg-emerald-400 text-white py-5 rounded-2xl font-black transition-all flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 active:scale-[0.98]"
                             >
-                                {t('Reserve All Segments')} <ChevronRight size={20} />
+                                {t('Reserve Regional Service')} <ChevronRight size={20} />
                             </button>
                         </div>
                     </div>
